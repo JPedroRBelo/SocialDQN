@@ -20,7 +20,7 @@ from utils.SocialSigns import SocialSigns
 
 
 class Environment:
-	def __init__(self,params,start_simulator=False,verbose=False,epi=0):
+	def __init__(self,params,simulator_path='',start_simulator=False,verbose=False,epi=0):
 		# if gpu is to be used
 		self.device = params['device']
 		#self.r_len=8
@@ -47,7 +47,17 @@ class Environment:
 		signal.signal(signal.SIGINT, self.signalHandler)
 
 		if(start_simulator):
-			self.init_simulator(params['env_name'])
+			name = params['env_name']
+			folder = name
+			if(not simulator_path==''):
+				folder = simulator_path
+
+				
+			
+			
+			command = './'+name+'.x86_64'			
+			command = abspath(join(folder,command))
+			self.init_simulator(command)
 		self.socket,self.client = self.__connect()	
 		self.set_configuration()
 
@@ -82,7 +92,7 @@ class Environment:
 
 	def get_tensor_from_file(self,file):
 		convert = T.Compose([T.ToPILImage(),
-			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=Image.BILINEAR),
+			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=T.InterpolationMode.BILINEAR),
 			T.ToTensor()])
 		screen = Image.open(file)
 		screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
@@ -189,7 +199,7 @@ class Environment:
 					data = data. replace(" ", "")
 					reward = float(data.replace(',','.'))
 					terminal = self.is_final_state(action,reward)
-					if self.step >= self.params['t_steps']:
+					if self.step >= self.params['t_steps']-1:
 						terminal = True
 						reward = self.ep_fail_reward
 					self.step += 1
@@ -295,11 +305,8 @@ class Environment:
 	def close(self):
 		self.socket.close()
 
-	def init_simulator(self,name):
-		folder = name
-		command = './'+name+'.x86_64'
-		command = abspath(join(folder,command))
-		print(command)
+	def init_simulator(self,command):
+
 		self.process = self.openSim(command,self.process)
 
 	def close_simulator(self):
