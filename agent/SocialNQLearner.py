@@ -9,8 +9,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from network.SSDQNetwork import *
-from network.Network import *
+from network.SDQNetwork import *
 import torch.nn as nn
 
 
@@ -18,7 +17,7 @@ import torch.nn as nn
 # -------------------------------------------------------------------- #
 # Neural Q-Learning
 # -------------------------------------------------------------------- #
-class SocialAgent():
+class Agent():
     """Interacts with and learns from the environment."""
 
     def __init__(self, state_size, action_size, param, seed):
@@ -41,12 +40,9 @@ class SocialAgent():
         # Q-Network (Fully connected)
         #self.Q_network = QNetwork(state_size, action_size, param['hidden_layers'], seed).to(self.device)
         #self.Q_network_target = QNetwork(state_size, action_size, param['hidden_layers'], seed).to(self.device)
-        self.gray_Q_network = SSDQN(param)
-        self.gray_Q_network_target = SSDQN(param)
-        self.depth_Q_network = DQN(param)
-        self.depth_Q_network_target = DQN(param)
-        self.gray_optimizer = optim.Adam(self.gray_Q_network.parameters(), lr=param['learning_rate'])
-        self.depth_optimizer = optim.Adam(self.depth_Q_network.parameters(), lr=param['learning_rate'])
+        self.Q_network = DQN(param)
+        self.Q_network_target = DQN(param)
+        self.optimizer = optim.Adam(self.Q_network.parameters(), lr=param['learning_rate'])
         #self.optimizer = optim.RMSprop(self.Q_network.parameters(), lr=param['learning_rate'])
 
         # Initialize update parameters
@@ -57,34 +53,22 @@ class SocialAgent():
         # Print model summary
         #print(self.Q_network)
 
-    def greedy(self, gray_state,depth_state):
+    def greedy(self, state):
         """Returns actions for given state as per current policy.
         Params
         ======
             state (array_like): current state
         """
         #state = torch.from_numpy(state).float().unsqueeze(0).to(device)
-        self.gray_Q_network.eval()
-        self.depth_Q_network.eval()
+        self.Q_network.eval()
         with torch.no_grad():
-            gray_action_values = self.gray_Q_network(gray_state)[0]
-            depth_action_values = self.depth_Q_network(depth_state)[0]
-        self.gray_Q_network.train()
-        self.depth_Q_network.train()
+            action_values = self.Q_network(state)
+        self.Q_network.train()
         # Greedy action selection
-        tg = 0
-        td = 0
-        for i in range(self.action_size):
-            tg += gray_action_values[i]
-            td += depth_action_values[i]
+        return np.argmax(action_values.cpu().data.numpy())
 
 
-        q_fus=((gray_action_values)*0.5)+((depth_action_values)*0.5)
-        action = np.argmax(q_fus.cpu().data.numpy())
-        return action
-
-
-    def eGreedy(self, gray_state,depth_state, eps=0.):
+    def eGreedy(self, state, eps=0.):
         """Returns actions for given state as per current policy.
         Params
         ======
@@ -93,7 +77,7 @@ class SocialAgent():
         """
         # Epsilon-greedy action selection
         if random.random() > eps:
-            return self.greedy(gray_state,depth_state)
+            return self.greedy(state)
         else:
             return random.choice(np.arange(self.action_size))
 
@@ -104,46 +88,26 @@ class SocialAgent():
             experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples
             gamma (float): discount factor
         """
-        gray_states,depth_states, actions, rewards, next_gray_states, next_depth_states, dones = experiences
+        states, actions, rewards, next_states, dones = experiences
 
         # Get max predicted Q values (for next states) from target model
-        gray_Q_targets_next = self.gray_Q_network_target(next_gray_states).detach().max(1)[0].unsqueeze(1)
+        Q_targets_next = self.Q_network_target(next_states).detach().max(1)[0].unsqueeze(1)
         # Compute Q targets for current states
-        gray_Q_targets = rewards + (self.gamma * gray_Q_targets_next * (1 - dones))
+        Q_targets = rewards + (self.gamma * Q_targets_next * (1 - dones))
 
         # Get expected Q values from local model
-        gray_Q_expected = self.gray_Q_network(gray_states).gather(1, actions)
+        Q_expected = self.Q_network(states).gather(1, actions)
 
         # Compute loss
-        loss = F.mse_loss(gray_Q_expected, gray_Q_targets)
+        loss = F.mse_loss(Q_expected, Q_targets)
         # Minimize the loss
-        self.gray_optimizer.zero_grad()
+        self.optimizer.zero_grad()
         loss.backward()
-        self.gray_optimizer.step()
+        self.optimizer.step()
 
         # Update target network
         if (self.t_updates % self.fix_target_updates) == 0:
-            self.update_target(self.gray_Q_network, self.gray_Q_network_target, self.thau)
-
-        # Get max predicted Q values (for next states) from target model
-        depth_Q_targets_next = self.depth_Q_network_target(next_depth_states).detach().max(1)[0].unsqueeze(1)
-        # Compute Q targets for current states
-        depth_Q_targets = rewards + (self.gamma * depth_Q_targets_next * (1 - dones))
-
-        # Get expected Q values from local model
-        depth_Q_expected = self.depth_Q_network(depth_states).gather(1, actions)
-
-        # Compute loss
-        loss = F.mse_loss(depth_Q_expected, depth_Q_targets)
-        # Minimize the loss
-        self.depth_optimizer.zero_grad()
-        loss.backward()
-        self.depth_optimizer.step()
-
-        # Update target network
-        if (self.t_updates % self.fix_target_updates) == 0:
-            self.update_target(self.depth_Q_network, self.depth_Q_network_target, self.thau)
-
+            self.update_target(self.Q_network, self.Q_network_target, self.thau)
         self.t_updates += 1
 
     def update_target(self, local_model, target_model, tau):
@@ -159,12 +123,10 @@ class SocialAgent():
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
     def export_network(self,filename):
-        torch.save(self.gray_Q_network.state_dict(), '%sgray.pth'% (filename))
-        torch.save(self.depth_Q_network.state_dict(), '%sdepth.pth'% (filename))
+        torch.save(self.Q_network.state_dict(), '%s.pth'% (filename))
 
     def import_network(self,filename):
-        self.gray_Q_network.load_state_dict(torch.load('%sgray.pth'% (filename)))
-        self.depth_Q_network.load_state_dict(torch.load('%sdepth.pth'% (filename)))
+        self.Q_network.load_state_dict(torch.load('%s.pth'% (filename)))
 
 # -------------------------------------------------------------------- #
 # EOF
