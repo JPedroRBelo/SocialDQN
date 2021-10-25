@@ -1,0 +1,322 @@
+import sys
+sys.path.append('../')
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import torchvision.transforms as T
+import numpy as np
+import socket
+import time
+from io import BytesIO
+from PIL import Image
+import signal
+import subprocess
+from subprocess import Popen
+from os.path import abspath, dirname, join
+from utils.SocialSigns import SocialSigns
+
+
+
+
+class Environment:
+	def __init__(self,params,start_simulator=False,verbose=False,epi=0):
+		# if gpu is to be used
+		self.device = params['device']
+		#self.r_len=8
+		self.episode=epi
+		self.verbose = verbose
+		self.raw_frame_height= params['frame_height']
+		self.raw_frame_width= params['frame_width']
+		self.proc_frame_size= params['frame_size']
+		self.state_size=params['state_size']
+		self.simulation_speed = params['simulation_speed']
+		self.neutral_reward = params['neutral_reward']
+		self.hs_success_reward = params['hs_success_reward']
+		self.hs_fail_reward = params['hs_fail_reward']
+		self.eg_success_reward = params['eg_success_reward']
+		self.eg_fail_reward = params['eg_fail_reward']
+		self.ep_fail_reward = params['ep_fail_reward']
+		self.ep_fail_reward = params['ep_fail_reward']
+		
+		self.params = params
+		self.step = 0
+		self.SocialSigns = SocialSigns()
+
+		self.process = Popen('false')		
+		signal.signal(signal.SIGINT, self.signalHandler)
+
+		if(start_simulator):
+			self.init_simulator(params['env_name'])
+		self.socket,self.client = self.__connect()	
+		self.set_configuration()
+
+	def __connect(self):
+		skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		port = self.params['port']		
+		host=self.params['host']
+		flag_connection = False	
+		count = 0	
+		while(not flag_connection):
+			try:
+				client =skt.connect((host, port))
+				flag_connection = True
+				return skt,client
+			except socket.error:
+				if count > 5:
+					print("Can't connect with robot! Trying again...")
+				count += 1
+				time.sleep(1)
+
+		return None,None
+	def set_configuration(self):
+		self.config_simulation("speed"+str(self.simulation_speed))
+		self.config_simulation("reward neutral:"+str(self.neutral_reward))
+		self.config_simulation("reward hs_success:"+str(self.hs_success_reward))
+		self.config_simulation("reward hs_fail:"+str(self.hs_fail_reward))
+		self.config_simulation("reward eg_success:"+str(self.eg_success_reward))
+		self.config_simulation("reward eg_fail:"+str(self.eg_fail_reward))
+
+	def connect(self):
+		self.socket,self.client = self.__connect()	
+
+	def get_tensor_from_file(self,file):
+		convert = T.Compose([T.ToPILImage(),
+			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=Image.BILINEAR),
+			T.ToTensor()])
+		screen = Image.open(file)
+		screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
+		screen = torch.from_numpy(screen)
+		screen = convert(screen).to(self.device)
+		return screen
+
+	def pre_process(self,step):	
+		proc_image=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
+		proc_depth=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
+		
+		dirname_rgb='dataset/RGB/ep'+str(self.episode)
+		dirname_dep='dataset/Depth/ep'+str(self.episode)
+		for i in range(self.state_size):
+
+			grayfile=dirname_rgb+'/image_'+str(step)+'_'+str(i+1)+'.png'
+			depthfile=dirname_dep+'/depth_'+str(step)+'_'+str(i+1)+'.png'
+			proc_image[i] = self.get_tensor_from_file(grayfile)
+			proc_depth[i] = self.get_tensor_from_file(depthfile)			
+
+		return proc_image.unsqueeze(0),proc_depth.unsqueeze(0)
+
+
+	def get_tensor_from_image(self,screen):
+		convert = T.Compose([T.ToPILImage(),
+			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=Image.BILINEAR),
+			T.ToTensor()])
+		screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
+		screen = torch.from_numpy(screen)
+		screen = convert(screen).to(self.device)
+		return screen
+
+	def convert_to_image(self,bytes_image):
+
+		dataBytesIO = BytesIO(bytes_image)
+		try:
+			img = Image.open(dataBytesIO).convert('L')
+			
+		except:
+			#img =  Image.new('L', (self.proc_frame_size, self.proc_frame_size))
+			#print('Image Error...')
+			return None
+
+		return img
+
+	def pre_process(self,grayimages,depthimages):
+		proc_image=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
+		proc_depth=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
+		
+		i = 0
+		for gray,depth in zip(grayimages,depthimages):
+
+			img_g = gray
+			img_d = depth
+			proc_image[i] = self.get_tensor_from_image(img_g)
+			proc_depth[i] = self.get_tensor_from_image(img_d)	
+			i += 1		
+
+		return proc_image.unsqueeze(0),proc_depth.unsqueeze(0)
+
+	
+	def send_data_to_pepper(self,data):
+		action = self.params['actions'][data]
+		self.socket.send(action.encode())
+		while True:
+			reward = self.socket.recv(1024).decode()
+			if reward:
+				return float(reward.replace(',','.'))
+			break
+		return 0
+
+	def config_simulation(self,data,text="Configuring"):
+
+		if self.verbose: 
+			print('{} Simulator: {}'.format(text,data))
+		
+		self.socket.send(data.encode())
+
+		while True:
+			msg = self.socket.recv(1024).decode()
+			if msg:				
+				return float(msg.replace(',','.').replace('\n',''))
+			break
+		return 0
+
+	def is_final_state(self,action,reward):
+		if(action=='4') and (reward == self.hs_success_reward):
+
+			return True
+		else:
+			return False
+
+
+	def execute(self,data):
+		action = self.params['actions'][data]
+		self.socket.send(action.encode())
+		terminal = False
+		
+		while True:
+			data = self.socket.recv(1024).decode()
+			if data:
+				if("reward" in data):
+					data = data. replace("reward", "")
+					data = data. replace(" ", "")
+					reward = float(data.replace(',','.'))
+					terminal = self.is_final_state(action,reward)
+					if self.step >= self.params['t_steps']:
+						terminal = True
+						reward = self.ep_fail_reward
+					self.step += 1
+					return reward,terminal				
+		return 0
+
+	def perform_action(self,action,step):
+		r=self.send_data_to_pepper(action)
+		s,d=self.pre_process(step)
+		term = False
+		return s,d,r,term
+
+
+
+	def get_screen(self):
+		
+		states_gray = []
+		states_depth = []
+		s = []
+		d = []
+		face_count = 0
+		self.socket.send('get_screen'.encode())
+		while True:		
+			recv = self.socket.recv(1024)
+			if(recv):
+				break;
+		counter = 0
+		import struct
+		j = 0
+		for i in range(16):
+			size = 0
+			self.socket.send('next_size'.encode())
+			while True:							
+				recv = self.socket.recv(6)
+				recv = recv.decode().rstrip("\n")
+				if recv.isdigit():
+					size = int(recv)#.decode()
+					if size != 0:
+						break;
+			#self.socket.send('next'.encode())
+
+
+			self.socket.send('next_image'.encode())		
+
+			data_img = self.receive_image(size)
+			image = self.convert_to_image(data_img)
+			n_tries = 0
+			while True:
+				if(image == None):
+					n_tries += 1
+					#print("Image error: ",str(i))
+					self.socket.send('last_image'.encode())
+					data_img= self.receive_image(size)
+					image = self.convert_to_image(data_img)
+					if(n_tries>3):
+						print("Image {} Error: #{}th attempt.".format(i,n_tries))
+				else:
+					break
+
+			if(counter%2==0):
+				num_faces = self.SocialSigns.find_faces(image)
+				if(num_faces):
+					face_count+=1
+				states_gray.append(image)
+			else:
+				
+				states_depth.append(image)
+				
+			counter += 1
+
+		face_state = [1,0]
+		if face_count > 4:
+			face_state = [0,1]
+
+		face_state = torch.FloatTensor(face_state).unsqueeze(0)
+		
+		s,d = self.pre_process(states_gray,states_depth)
+
+		s = [s,face_state]
+		return s,d
+
+	def receive_image(self,size):
+		read = 0
+		while True:				
+			recv = self.socket.recv(size)
+			read += len(recv)
+			if(read>=size):					
+				break
+		return recv	
+
+	def reset(self):
+		self.config_simulation("reset","Reseting")
+		time.sleep(5)
+		self.close()
+		self.connect()
+		self.step = 0
+		self.set_configuration()
+	
+	def close_connection(self):
+		self.close_simulator()	
+		self.socket.close()
+
+	def close(self):
+		self.socket.close()
+
+	def init_simulator(self,name):
+		folder = name
+		command = './'+name+'.x86_64'
+		command = abspath(join(folder,command))
+		print(command)
+		self.process = self.openSim(command,self.process)
+
+	def close_simulator(self):
+		self.killSim(self.process)
+
+
+
+	def openSim(self,command,process):
+		process.terminate()
+		process = Popen(command)
+		return process
+
+	def killSim(self,process):
+		process.terminate()		
+		#time.sleep(1)
+
+	def signalHandler(self,sig, frame):
+	    self.process.terminate()
+	    sys.exit(0)
+

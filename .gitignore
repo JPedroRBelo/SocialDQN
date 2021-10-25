@@ -1,3 +1,19 @@
+*/dataset/RGB/ep*
+*/dataset/Depth/ep*
+dqn/scores/*
+*/simDRLSR/*
+*/SimDRLSR/*
+SimDRLSR/*
+simDRLSR/*
+environment/simDRLSR/*
+
+
+#scores/
+#simMDQN/dataset/*
+dataset.*
+test.csv
+Dockerfile
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
