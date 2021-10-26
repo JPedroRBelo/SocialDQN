@@ -4,11 +4,11 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     5,
+        'simulation_speed':     7,
         'number_of_agents':     1,
         'action_size':          4,
         'state_size':           8,
-        't_steps':              20,
+        't_steps':              3,
         'frame_height':         320,
         'frame_width':          240,
         'frame_size':           198,
@@ -20,11 +20,9 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       15000,
+        'train_episodes':       1,
         'save_images':          False,
         'solved_score':         0.9,
-        'stop_when_solved':     True,
-
 
         #Social DQN params
         'social_state_size':    2,
@@ -35,16 +33,15 @@ PARAMETERS = {
         'replay_size':          50000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
-        'replay_initial':       300,              # replay buffer initialize
-        'update_interval':      1,                  # network updating every update_interval steps
+        'replay_initial':       100,              # replay buffer initialize
+        'update_interval':      4,                  # network updating every update_interval steps
         'fix_target_updates':   1,                 # fix the target Q for the fix_target_updates
-        'train_after_episodes': True,
 
         #'hidden_layers':        [16,32,64,256],           # hidden units and layers of Q-network
 
         'epsilon_start':        1,                # starting value of epsilon
         'epsilon_final':        0.05,               # minimum value of epsilon
-        'epsilon_decay':        0.999,              # factor for decreasing epsilon
+        'epsilon_decay':        0.998,              # factor for decreasing epsilon
 
         'learning_rate':        25e-5,               # learning rate
         'gamma':                0.99,               # discount factor
