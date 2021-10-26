@@ -16,6 +16,7 @@ class DQN(nn.Module):
 		self.kernels=params['kernels']
 		self.strides=params['strides']
 		self.poolsize=params['poolsize']
+		self.nstates_social = params['nstates_social']
 		self.features = nn.Sequential(
 			nn.Conv2d(in_channels=self.nfeats,out_channels=self.nstates[0], kernel_size=self.kernels[0],stride=self.strides[0],padding=1),
 			nn.BatchNorm2d(self.nstates[0]),
@@ -54,7 +55,7 @@ class DQN(nn.Module):
 		conv = self.fc1(conv)
 
 		ac = self.linear(x[1])
-		ac = ac.view(ac.size(0),256)
+		ac = ac.view(ac.size(0),self.nstates_social[0])
 
 		cat = torch.cat((conv, ac), 1)
 

@@ -127,7 +127,7 @@ def init_files():
     Path("models").mkdir(parents=True, exist_ok=True)
     Path("results").mkdir(parents=True, exist_ok=True)
 
-def save_train_files(cfg):
+def save_train_files(cfg,notes=""):
     now = datetime.now()
     filename = now.strftime("%Y%m%d_%H%M%S")
     folder = os.path.join('results', filename)
@@ -135,6 +135,10 @@ def save_train_files(cfg):
     shutil.copy(cfg.__file__,folder)
     shutil.copytree('scores',os.path.join(folder, 'scores'), dirs_exist_ok=True)
     shutil.copytree('models',os.path.join(folder, 'models'), dirs_exist_ok=True)
+    if(not notes==""):
+        with open(os.path.join(folder,'notes.txt'), 'w') as f:
+            f.write(notes)
+
 
 
 
@@ -149,6 +153,7 @@ def main(cfg):
 
     save_images = params['save_images']
     solved_score = params['solved_score']
+    stop_when_solved = params['stop_when_solved']
 
     start_simulator = False
     if(not parsed_args.sim==''):
@@ -162,6 +167,7 @@ def main(cfg):
     number_of_agents = params['number_of_agents']
     action_size = params['action_size']
     state_size = params['state_size']
+    train_after_episodes = params['train_after_episodes']
 
     print('Number of agents  : ', number_of_agents)
     print('Number of actions : ', action_size)
@@ -223,7 +229,7 @@ def main(cfg):
             ep_actions_rewards.append([action,reward])
             # Update Q-Learning
             step += 1
-            if (step % update_interval) == 0 and len(memory) > replay_start:
+            if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start:
                 # Recall experiences (miniBatch)
                 experiences = memory.recall()
                 # Train agent
@@ -236,6 +242,14 @@ def main(cfg):
 
             # Update total score
             score += reward
+            
+
+        if (train_after_episodes) and (i_episode % update_interval) == 0 and len(memory) > replay_start:
+            # Recall experiences (miniBatch)
+            experiences = memory.recall()
+            # Train agent
+            agent.learn(experiences)
+            #print('\r#Training step:{}'.format(step), end="")
 
         # Push to score list
         actions_rewards.append( ep_actions_rewards)
@@ -249,12 +263,11 @@ def main(cfg):
             print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
-        if np.mean(scores_window)>=solved_score:
-            #print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_window)))
+        if (np.mean(scores_window)>=solved_score)and stop_when_solved:
+            print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
-            pass
-            #break
-                
+            #pass
+            break                
 
 
         # Update exploration
@@ -275,6 +288,7 @@ def main(cfg):
 if __name__ == "__main__":    
     init_files()
     delete_old_files()
-    import config.test1 as cfg     
+    import config.hyperparams as cfg     
     main(cfg)
-    save_train_files(cfg)
+    notes = '###TEST####\nSocialDQN'
+    save_train_files(cfg,notes)
