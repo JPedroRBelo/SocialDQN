@@ -27,17 +27,22 @@ def plot(scores,name,params,i_episode,save=False):
 
 
 	ax = fig.add_subplot(111)
-	episode = np.arange(len(scores[0]))
+	episode = np.arange(len(scores[0][0]))
 	
 	average_scores = []
-	for scr in scores:
+	count = 1
+	legends = []
+	for scr,legend in scores:
 		df = pandas.DataFrame(scr,columns=['scores','average_scores','std'])
 		plt.plot(episode,df['average_scores'])
 		plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
-	
+		legends.append(legend)
+		count += 1
+	ax.legend(legends)
+		
 	#plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
 
-	ax.legend([' [ Average scores ]'])
+	
 	plt.ylabel('Score')
 	plt.xlabel('Episode')
 
@@ -85,7 +90,9 @@ def box_plot(results):
 
 def main():
 
-	scores = pd.read_csv('tests/NeuralQLearner_simDRLSR_batch_64_lr_3E-04_trained_15000_episodes.csv', sep=',')
+	
+	scores1 = pd.read_csv('results/20211030_064156/scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv', sep=',') 
+	scores2 = pd.read_csv('results/20211103_084843/scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv', sep=',') 
 	params = PARAMETERS['SimDRLSR']
 	neutral_reward = params['neutral_reward']
 	hs_success_reward = params['hs_success_reward']
@@ -94,11 +101,12 @@ def main():
 	eg_fail_reward = params['eg_fail_reward']
 	ep_fail_reward = params['ep_fail_reward']
 	average_scores = []
-	average_scores.append(calc_average_scores(scores['scores'],maxlen=100))
-	average_scores.append(calc_average_scores(scores['scores'],maxlen=1000))
+	average_scores.append([calc_average_scores(scores1['scores'],maxlen=50),'Train after each Epoch'])
+	average_scores.append([calc_average_scores(scores2['scores'],maxlen=50),'Train after 4 Steps'])
+	
 	#recalc_scores2 = calc_average_scores(scores['scores'],maxlen=500)
-	box_plot(average_scores[1])
-	#plot(average_scores,'result',params,100)
+	#box_plot(average_scores)
+	plot(average_scores,'result',params,100)
 
 if __name__ == "__main__":
 	main()
