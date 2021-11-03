@@ -36,9 +36,9 @@ PARAMETERS = {
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
-        'update_interval':      1,                  # network updating every update_interval steps
+        'update_interval':      4,                  # network updating every update_interval steps
         'fix_target_updates':   1,                 # fix the target Q for the fix_target_updates
-        'train_after_episodes': True,
+        'train_after_episodes': False,
 
         #'hidden_layers':        [16,32,64,256],           # hidden units and layers of Q-network
 
