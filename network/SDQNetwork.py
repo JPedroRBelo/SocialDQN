@@ -67,6 +67,6 @@ class DQN(nn.Module):
 			cat = self.fc2(cat)
 			cat = self.classifier(cat)
 		else:
-			cat = image_classifier(conv)
-			
+			cat = self.image_classifier(conv)
+
 		return cat
