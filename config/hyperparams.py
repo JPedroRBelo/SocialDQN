@@ -45,7 +45,7 @@ PARAMETERS = {
 
 
 
-        'epsilon_start':        1,                # starting value of epsilon
+        'epsilon_start':        0.05,                # starting value of epsilon
         'epsilon_final':        0.05,               # minimum value of epsilon
         'epsilon_decay':        0.999,              # factor for decreasing epsilon
 
