@@ -27,7 +27,7 @@ PARAMETERS = {
 
 
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         'social_state_size':    2,
         'nstates_social':       [256],
 
