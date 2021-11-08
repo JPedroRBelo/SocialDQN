@@ -46,18 +46,20 @@ def plot(scores,name,params,i_episode,save=False):
 	plt.ylabel('Score')
 	plt.xlabel('Episode')
 
+	max_total_fails = -5
+	max_total_success = 1.5
 
    
-	#major_ticks = np.arange(max_total_fails, max_total_success, 0.5)
-	#minor_ticks = np.arange(max_total_fails, max_total_success, 0.1)
+	major_ticks = np.arange(max_total_fails, max_total_success, 0.5)
+	minor_ticks = np.arange(max_total_fails, max_total_success, 0.1)
 
 	#ax.set_xticks(major_ticks)
 	#ax.set_xticks(minor_ticks, minor=True)
-	#ax.set_yticks(major_ticks)
-	#ax.set_yticks(minor_ticks, minor=True)
-	#ax.axhline(1, color='gray', linewidth=0.5)
-	#ax.axhline(0, color='gray', linewidth=0.5)
-	#ax.axhline(-1, color='gray', linewidth=0.5)
+	ax.set_yticks(major_ticks)
+	ax.set_yticks(minor_ticks, minor=True)
+	ax.axhline(1, color='gray', linewidth=0.5)
+	ax.axhline(0, color='gray', linewidth=0.5)
+	ax.axhline(-1, color='gray', linewidth=0.5)
 	# And a corresponding grid
 	#ax.grid(which='both')#,axis='y')
 
@@ -101,8 +103,8 @@ def main():
 	eg_fail_reward = params['eg_fail_reward']
 	ep_fail_reward = params['ep_fail_reward']
 	average_scores = []
-	average_scores.append([calc_average_scores(scores1['scores'],maxlen=50),'Train after each Epoch'])
-	average_scores.append([calc_average_scores(scores2['scores'],maxlen=50),'Train after 4 Steps'])
+	average_scores.append([calc_average_scores(scores1['scores'],maxlen=100),'Train after each Epoch'])
+	average_scores.append([calc_average_scores(scores2['scores'],maxlen=100),'Train after 4 Steps'])
 	
 	#recalc_scores2 = calc_average_scores(scores['scores'],maxlen=500)
 	#box_plot(average_scores)
