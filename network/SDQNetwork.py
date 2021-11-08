@@ -68,7 +68,7 @@ class DQN(nn.Module):
 			cat = self.classifier(cat)
 			print(True)
 		else:
-			print(True)
+			print(False)
 			cat = self.image_classifier(conv)
 
 		return cat
