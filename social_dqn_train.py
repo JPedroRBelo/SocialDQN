@@ -218,10 +218,12 @@ def main(cfg):
             next_gray_state,next_depth_state = env.get_screen()
 
             if(save_images):
-                gray_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'gray',next_gray_state))
-                depth_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'depth',next_depth_state))
-                gray_thread.start()
-                depth_thread.start()
+                if(next_gray_state!=None):
+                    gray_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'gray',next_gray_state[0]))
+                    gray_thread.start()
+                if(next_depth_state!=None):
+                    depth_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'depth',next_depth_state))                    
+                    depth_thread.start()
 
             # Store experience
             memory.push(gray_state, action, reward, next_gray_state, done)
@@ -290,5 +292,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###TEST####\nSocialDQN'
+    notes = '###Testing SimDRLSR v0.310####\nSocialDQN\nFace states given by simuation\nDepth sates are not received by socket'
     save_train_files(cfg,notes)
