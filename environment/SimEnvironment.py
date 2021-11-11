@@ -38,6 +38,7 @@ class Environment:
 		self.eg_fail_reward = params['eg_fail_reward']
 		self.ep_fail_reward = params['ep_fail_reward']
 		self.ep_fail_reward = params['ep_fail_reward']
+		self.use_depth_state = params['use_depth_state']
 		
 		self.params = params
 		self.step = 0
@@ -86,6 +87,7 @@ class Environment:
 		self.config_simulation("reward hs_fail:"+str(self.hs_fail_reward))
 		self.config_simulation("reward eg_success:"+str(self.eg_success_reward))
 		self.config_simulation("reward eg_fail:"+str(self.eg_fail_reward))
+		self.config_simulation("use_depth"+str(self.use_depth_state))
 
 	def connect(self):
 		self.socket,self.client = self.__connect()	
@@ -100,6 +102,7 @@ class Environment:
 		screen = convert(screen).to(self.device)
 		return screen
 
+	'''
 	def pre_process(self,step):	
 		proc_image=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
 		proc_depth=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
@@ -114,7 +117,7 @@ class Environment:
 			proc_depth[i] = self.get_tensor_from_file(depthfile)			
 
 		return proc_image.unsqueeze(0),proc_depth.unsqueeze(0)
-
+	'''
 
 	def get_tensor_from_image(self,screen):
 		convert = T.Compose([T.ToPILImage(),
@@ -138,20 +141,13 @@ class Environment:
 
 		return img
 
-	def pre_process(self,grayimages,depthimages):
-		proc_image=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
-		proc_depth=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)
-		
+	def pre_process(self,images):
+		proc_image=torch.FloatTensor(self.state_size,self.proc_frame_size,self.proc_frame_size)		
 		i = 0
-		for gray,depth in zip(grayimages,depthimages):
-
-			img_g = gray
-			img_d = depth
-			proc_image[i] = self.get_tensor_from_image(img_g)
-			proc_depth[i] = self.get_tensor_from_image(img_d)	
+		for image in images:
+			proc_image[i] = self.get_tensor_from_image(image)	
 			i += 1		
-
-		return proc_image.unsqueeze(0),proc_depth.unsqueeze(0)
+		return proc_image.unsqueeze(0)
 
 	
 	def send_data_to_pepper(self,data):
@@ -206,13 +202,14 @@ class Environment:
 					return reward,terminal				
 		return 0
 
+	'''
 	def perform_action(self,action,step):
 		r=self.send_data_to_pepper(action)
 		s,d=self.pre_process(step)
 		term = False
 		return s,d,r,term
 
-
+	'''
 
 	def get_screen(self):
 		
@@ -229,7 +226,13 @@ class Environment:
 		counter = 0
 		import struct
 		j = 0
-		for i in range(16):
+		n_channels = 1
+		if(self.use_depth_state):
+			n_channels+=1
+
+
+
+		for i in range(n_channels*self.state_size):
 			size = 0
 			self.socket.send('next_size'.encode())
 			while True:							
@@ -250,7 +253,7 @@ class Environment:
 			while True:
 				if(image == None):
 					n_tries += 1
-					#print("Image error: ",str(i))
+					print("Image error: ",str(i))
 					self.socket.send('last_image'.encode())
 					data_img= self.receive_image(size)
 					image = self.convert_to_image(data_img)
@@ -259,9 +262,18 @@ class Environment:
 				else:
 					break
 
-			if(counter%2==0):
-				num_faces = self.SocialSigns.find_faces(image)
-				if(num_faces):
+
+			if(counter%n_channels==0):
+				#num_faces = self.SocialSigns.find_faces(image)
+				#face= num_faces
+				self.socket.send('next_face'.encode())
+				face = False
+				while True:
+					msg = self.socket.recv(1024).decode()
+					if msg:				
+						face = msg.replace('\n','') == "True"
+					break
+				if(face):
 					face_count+=1
 				states_gray.append(image)
 			else:
@@ -269,14 +281,16 @@ class Environment:
 				states_depth.append(image)
 				
 			counter += 1
-
 		face_state = [1,0]
 		if face_count > 4:
 			face_state = [0,1]
 
 		face_state = torch.FloatTensor(face_state).unsqueeze(0)
 		
-		s,d = self.pre_process(states_gray,states_depth)
+		s = self.pre_process(states_gray)
+		d = None
+		if(self.use_depth_state):
+			d = self.pre_process(states_depth)
 
 		s = [s,face_state]
 		return s,d

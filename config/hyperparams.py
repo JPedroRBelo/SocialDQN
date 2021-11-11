@@ -25,7 +25,8 @@ PARAMETERS = {
         'solved_score':         0.9,
         'stop_when_solved':     True,
 
-
+        #Multimodal DQN: get detph states
+        'use_depth_state':      False,
         #Social DQN params
         'enable_social_signs':  True,
         'social_state_size':    2,
@@ -45,7 +46,7 @@ PARAMETERS = {
 
 
 
-        'epsilon_start':        0.05,                # starting value of epsilon
+        'epsilon_start':        1.0,                # starting value of epsilon
         'epsilon_final':        0.05,               # minimum value of epsilon
         'epsilon_decay':        0.999,              # factor for decreasing epsilon
 

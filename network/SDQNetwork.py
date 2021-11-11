@@ -66,7 +66,6 @@ class DQN(nn.Module):
 			cat = torch.cat((conv, ac), 1)
 			cat = self.fc2(cat)
 			cat = self.classifier(cat)
-			print(x[1])
 		else:
 			cat = self.image_classifier(conv)
 
