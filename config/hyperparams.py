@@ -21,12 +21,14 @@ PARAMETERS = {
         'stop_scores':          1.0,
         'scores_window_size':   100,
         'train_episodes':       15000,
-        'save_images':          False,
+        'save_images':          True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
 
         #Multimodal DQN: get detph states
         'use_depth_state':      False,
+        #WARNING: this mode turns all images to full black, in order to test the input of social signals
+        'blind_mode':           True,
         #Social DQN params
         'enable_social_signs':  True,
         'social_state_size':    2,

@@ -39,6 +39,7 @@ class Environment:
 		self.ep_fail_reward = params['ep_fail_reward']
 		self.ep_fail_reward = params['ep_fail_reward']
 		self.use_depth_state = params['use_depth_state']
+		self.blind_mode = params['blind_mode']
 		
 		self.params = params
 		self.step = 0
@@ -248,7 +249,10 @@ class Environment:
 			self.socket.send('next_image'.encode())		
 
 			data_img = self.receive_image(size)
-			image = self.convert_to_image(data_img)
+			if(not self.blind_mode):
+				image = self.convert_to_image(data_img)
+			else:
+				image =  Image.new('L', (self.proc_frame_size, self.proc_frame_size))
 			n_tries = 0
 			while True:
 				if(image == None):
@@ -258,7 +262,8 @@ class Environment:
 					data_img= self.receive_image(size)
 					image = self.convert_to_image(data_img)
 					if(n_tries>3):
-						print("Image {} Error: #{}th attempt.".format(i,n_tries))
+						pass
+						#print("Image {} Error: #{}th attempt.".format(i,n_tries))
 				else:
 					break
 
