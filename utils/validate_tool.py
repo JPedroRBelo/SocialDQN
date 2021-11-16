@@ -38,7 +38,7 @@ def plot(scores,name,params,i_episode,save=False):
 		plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
 		legends.append(legend)
 		count += 1
-	ax.legend(legends)
+	ax.legend(legends,loc='lower right')
 		
 	#plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
 
@@ -80,7 +80,7 @@ def plot_rewards(scores,name,params,i_episode,save=False):
 	fig = plt.figure(num=2,figsize=(10, 5))
 	plt.clf()
 
-
+	plt.legend(loc='lower right')
 	ax = fig.add_subplot(111)
 	episode = np.arange(len(scores[0][0]))
 	
@@ -266,7 +266,7 @@ def compare_cumulative_rewards(folders,labels):
 	scores = []
 	for fol,l in zip(folders,labels): 
 		score = pd.read_csv(os.path.join(fol,'scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv'), sep=',')
-		scores.append([calc_average_scores(score['scores'],maxlen=100),l])
+		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
 
 	#scores1 = pd.read_csv(os.path.join(folders[i],'scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv'), sep=',') 
 	#scores2 = pd.read_csv('results/20211103_084843/scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv', sep=',') 
@@ -289,14 +289,23 @@ def compare_cumulative_rewards(folders,labels):
 
 def main():
 	folders = []
-	folders.append('results/20211030_064156')
-	#folders.append('results/20211103_084843')
-	folders.append('results/20211107_055205')
-
 	labels = []
-	labels.append('Gray and Face States')
-	#labels.append('Train after 4 Steps')
-	labels.append('Only Gray State')
+	#labels.append('Gray and Face States (OpenCV)')
+	#Alternative
+	labels.append('Train after each Epoch')
+	folders.append('results/20211030_064156')
+
+	labels.append('Train after 4 Steps')
+	folders.append('results/20211103_084843')
+
+	#labels.append('Only Gray State')
+	#folders.append('results/20211107_055205')
+
+	
+	
+
+	
+	
 
 	while True:
 		print("=========================")		
