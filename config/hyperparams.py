@@ -23,7 +23,7 @@ PARAMETERS = {
         'train_episodes':       15000,
         'save_images':          False,
         'solved_score':         0.9,
-        'stop_when_solved':     True,
+        'stop_when_solved':     False,
 
         #Multimodal DQN: get detph states
         'use_depth_state':      False,
