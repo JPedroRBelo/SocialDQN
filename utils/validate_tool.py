@@ -292,15 +292,17 @@ def main():
 	labels = []
 	#labels.append('Gray and Face States (OpenCV)')
 	#Alternative
-	labels.append('Train after each Epoch')
-	folders.append('results/20211030_064156')
+	#labels.append('Train after each Epoch')
+	#folders.append('results/20211030_064156')
 
-	labels.append('Train after 4 Steps')
-	folders.append('results/20211103_084843')
+	#labels.append('Train after 4 Steps')
+	#folders.append('results/20211103_084843')
 
-	#labels.append('Only Gray State')
-	#folders.append('results/20211107_055205')
+	labels.append('Only Gray State')
+	folders.append('results/20211107_055205')
 
+	labels.append('Gray and Face States')
+	folders.append('results/20211115_185645')
 	
 	
 
