@@ -40,6 +40,7 @@ class Environment:
 		self.ep_fail_reward = params['ep_fail_reward']
 		self.use_depth_state = params['use_depth_state']
 		self.blind_mode = params['blind_mode']
+		self.use_only_depth_state = params['use_only_depth_state']
 		
 		self.params = params
 		self.step = 0
@@ -296,7 +297,8 @@ class Environment:
 		d = None
 		if(self.use_depth_state):
 			d = self.pre_process(states_depth)
-
+		if(self.use_only_depth_state):
+			s = d
 		s = [s,face_state]
 		return s,d
 
