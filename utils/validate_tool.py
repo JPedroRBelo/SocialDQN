@@ -301,6 +301,9 @@ def main():
 	labels.append('Only Gray State')
 	folders.append('results/20211107_055205')
 
+	labels.append('Only Face State')
+	folders.append('results/20211120_223307')
+
 	labels.append('Gray and Face States')
 	folders.append('results/20211115_185645')
 	
