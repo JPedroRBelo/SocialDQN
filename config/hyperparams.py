@@ -31,7 +31,7 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  True,
+        'enable_social_signs':  False,
         'social_state_size':    2,
         'nstates_social':       [256],
 

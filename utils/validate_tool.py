@@ -306,6 +306,9 @@ def main():
 
 	labels.append('Gray and Face States')
 	folders.append('results/20211115_185645')
+
+	labels.append('Depth and Face States')
+	folders.append('results/20211126_054848')
 	
 	
 

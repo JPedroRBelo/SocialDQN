@@ -292,5 +292,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###Testing SimDRLSR v0.310####\nSocialDQN\nFace states given by simuation\nDepth sates are not received by socket'
+    notes = '###Testing SimDRLSR v0.310####\nSocialDQN\nOnly Depth sates, without face and gray states'
     save_train_files(cfg,notes)
