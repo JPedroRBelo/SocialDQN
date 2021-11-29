@@ -1,0 +1,4 @@
+###Testing SimDRLSR v0.310####
+SocialDQN
+Face states given by simuation
+Depth sates are not received by socket
