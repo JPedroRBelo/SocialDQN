@@ -144,7 +144,8 @@ def box_plot(results):
 	#ax.set_xticklabels(names)
 	plt.show()
 
-def compare_actions(folders,labels,action):
+
+def calc_all_scores(folders,labels):
 	params = PARAMETERS['SimDRLSR']
 	neutral_reward = params['neutral_reward']
 	hs_success_reward = params['hs_success_reward']
@@ -152,6 +153,169 @@ def compare_actions(folders,labels,action):
 	eg_success_reward = params['eg_success_reward']
 	eg_fail_reward = params['eg_fail_reward']
 	ep_fail_reward = params['ep_fail_reward']
+	results_dict = {}
+	results_rewards = []
+	average_scores = []
+	for fol,l in zip(folders,labels):
+		pth = os.path.join(fol,'scores/action_reward_history.dat')
+		rewards = torch.load(pth)
+		results_rewards.append(rewards)
+		v_hspos = []
+		v_hsneg = []
+		v_wvpos = []
+		v_wvneg = []
+		v_wave  = []
+		v_wait  = []
+		v_look  = []
+		ep_durations = []
+
+		wait_total_scores = []  
+		wait_total_scores_window = deque(maxlen=100)
+
+		look_total_scores = []  
+		look_total_scores_window = deque(maxlen=100)
+
+		wave_total_scores = []  
+		wave_total_scores_window = deque(maxlen=100)
+
+		wave_positive_scores = []  
+		wave_positive_scores_window = deque(maxlen=100)
+
+		wave_negative_scores = []  
+		wave_negative_scores_window = deque(maxlen=100)
+
+		handshake_total_scores = []  
+		handshake_total_scores_window = deque(maxlen=100)
+
+		handshake_positive_scores = []  
+		handshake_positive_scores_window = deque(maxlen=100)
+
+		handshake_negative_scores = []  
+		handshake_negative_scores_window = deque(maxlen=100)
+
+
+
+
+
+		for i in range(len(rewards)):
+			
+
+			hspos = 0
+			hsneg = 0
+			wave = 0
+			wvpos = 0
+			wvneg = 0
+			wait = 0
+			look = 0
+			for step in range(len(rewards[i])):		
+				if(len(rewards[i])>0 ):
+					action = rewards[i][step][0]
+					reward = rewards[i][step][1]
+
+					if action == 3 :
+						if reward ==  hs_success_reward:
+							hspos = hspos+1
+						elif reward == hs_fail_reward: 
+							hsneg = hsneg+1
+					
+					elif action == 0 :
+						wait = wait+1
+					elif action == 1 :
+						look = look+1
+					elif action == 2 :
+						
+						
+						wave = wave+1
+						if reward == eg_success_reward:
+							wvpos = wvpos+1
+						elif reward == eg_fail_reward:
+							wvneg = wvneg+1
+					else:
+						print(reward)
+			
+		
+			
+			'''
+			print('###################')
+			print('Epoch\t\t',i+1)
+			print('Steps:\t\t',len(rewards[i]))	
+			print('Wait\t\t',wait)
+			print('Look\t\t',look)
+			print('Wave\t\t',wave)
+			print('Wv. Suc.\t',wvpos)
+			print('Wv. Fail\t',wvneg)
+			print('HS Suc.\t',hspos)
+			print('HS Fail\t',hsneg)
+			
+			if(not wvpos+wvneg == 0):
+				print('Wave Acuracy\t',((wvpos)/(wvpos+wvneg)))
+			if(not hspos+hsneg == 0):
+				print('HS Acuracy\t',((hspos)/(hspos+hsneg)))	
+			'''
+			ep_durations.append(len(rewards[i]))
+			v_wait.append(wait)
+			v_look.append(look)
+			v_wave.append(wave)
+			v_wvneg.append(wvneg)
+			v_wvpos.append(wvpos)
+			v_hspos.append(hspos)
+			v_hsneg.append(hsneg)
+
+
+			plot_value = len(rewards[i])
+			len_ep = len(rewards[i])
+			#plot_value = 1	
+			if (arg == 'wv'):
+				plot_value = wave/plot_value
+			elif (arg == 'wv positive'):
+				plot_value = wvpos/plot_value
+			elif (arg == 'wv negative'):
+				plot_value = wvneg/plot_value
+			elif (arg == 'hs'):
+				plot_value = (hspos+hsneg)/plot_value
+			elif (arg == 'hs positive'):
+				plot_value = hspos/plot_value
+			elif (arg == 'hs negative'):
+				plot_value = hsneg/plot_value
+			elif (arg == 'wait'):
+				plot_value = wait/plot_value
+			elif (arg == 'look'):
+				plot_value = look/plot_value
+
+			#wait
+			plot_value = wave/len_ep
+			wait_total_scores_window.append(plot_value) 
+			wait_total_scores.append([plot_value, np.mean(wait_total_scores_window), np.std(wait_total_scores_window)])
+
+			#look
+			plot_value = look/len_ep
+			look_total_scores_window.append(plot_value) 
+			look_total_scores.append([plot_value, np.mean(look_total_scores_window), np.std(look_total_scores_window)])
+
+			#wave
+			plot_value = look/len_ep
+			look_total_scores_window.append(plot_value) 
+			look_total_scores.append([plot_value, np.mean(look_total_scores_window), np.std(look_total_scores_window)])
+			
+
+		
+
+			scores_window.append(plot_value)
+			scores.append([plot_value, np.mean(scores_window), np.std(scores_window)])
+
+		average_scores.append([calc_average_scores(scores,maxlen=100),l])
+
+
+def compare_actions(folders,labels,arg):
+	params = PARAMETERS['SimDRLSR']
+	neutral_reward = params['neutral_reward']
+	hs_success_reward = params['hs_success_reward']
+	hs_fail_reward = params['hs_fail_reward']
+	eg_success_reward = params['eg_success_reward']
+	eg_fail_reward = params['eg_fail_reward']
+	ep_fail_reward = params['ep_fail_reward']
+
+
 
 	results_rewards = []
 	average_scores = []
@@ -236,7 +400,6 @@ def compare_actions(folders,labels,action):
 
 
 			plot_value = len(rewards[i])
-			arg = action
 			#plot_value = 1	
 			if (arg == 'wv'):
 				plot_value = wave/plot_value
@@ -254,6 +417,7 @@ def compare_actions(folders,labels,action):
 				plot_value = wait/plot_value
 			elif (arg == 'look'):
 				plot_value = look/plot_value
+
 
 			scores_window.append(plot_value)
 			scores.append([plot_value, np.mean(scores_window), np.std(scores_window)])
@@ -298,17 +462,28 @@ def main():
 	#labels.append('Train after 4 Steps')
 	#folders.append('results/20211103_084843')
 
-	labels.append('Only Gray State')
-	folders.append('results/20211107_055205')
-
-	labels.append('Only Face State')
-	folders.append('results/20211120_223307')
 
 	labels.append('Gray and Face States')
 	folders.append('results/20211115_185645')
 
-	labels.append('Depth and Face States')
-	folders.append('results/20211126_054848')
+	
+	labels.append('Only Gray State')
+	folders.append('results/20211107_055205')
+
+	
+	
+	
+
+	#labels.append('Only Face State')
+	#folders.append('results/20211120_223307')
+	
+	#labels.append('Depth and Face States')
+	#folders.append('results/20211126_054848')
+
+	#20211202_230251
+	#labels.append('Only Depth State')
+	#folders.append('results/20211202_230251')
+
 	
 	
 
@@ -319,8 +494,8 @@ def main():
 		print("=========================")		
 		print("|1 :Culmulative Rewards\t|")
 		print("|2 :Wave\t\t|")
-		print("|3 :Wave\t\t|")
-		print("|4 :Wave\t\t|")
+		print("|3 :Wave Positive\t|")
+		print("|4 :Wave Negative\t|")
 		print("|X :Exit\t\t|")
 		print("=========================")
 		with keyboard.Events() as events:

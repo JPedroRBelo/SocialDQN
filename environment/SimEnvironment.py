@@ -15,6 +15,7 @@ import subprocess
 from subprocess import Popen
 from os.path import abspath, dirname, join
 from utils.SocialSigns import SocialSigns
+import pandas as pd
 
 
 
@@ -41,6 +42,9 @@ class Environment:
 		self.use_depth_state = params['use_depth_state']
 		self.blind_mode = params['blind_mode']
 		self.use_only_depth_state = params['use_only_depth_state']
+		self.emotional_states = params['emotional_states']
+		series = pd.Series(self.emotional_states)
+		self.one_hot_vectors = pd.get_dummies(series)
 		
 		self.params = params
 		self.step = 0
@@ -120,6 +124,9 @@ class Environment:
 
 		return proc_image.unsqueeze(0),proc_depth.unsqueeze(0)
 	'''
+
+	def get_one_hot_vector(self,label):
+		return self.one_hot_vectors[label].values
 
 	def get_tensor_from_image(self,screen):
 		convert = T.Compose([T.ToPILImage(),
@@ -219,7 +226,7 @@ class Environment:
 		states_depth = []
 		s = []
 		d = []
-		face_count = 0
+		face_count = []
 		self.socket.send('get_screen'.encode())
 		while True:		
 			recv = self.socket.recv(1024)
@@ -272,27 +279,25 @@ class Environment:
 			if(counter%n_channels==0):
 				#num_faces = self.SocialSigns.find_faces(image)
 				#face= num_faces
-				self.socket.send('next_face'.encode())
-				face = False
+				self.socket.send('next_emotion'.encode())
+				face = 'no_face'
 				while True:
 					msg = self.socket.recv(1024).decode()
 					if msg:				
-						face = msg.replace('\n','') == "True"
+						face = msg.replace('\n','')
 					break
-				if(face):
-					face_count+=1
+				if(face in self.emotional_states):
+					face_count.append(face)
 				states_gray.append(image)
 			else:
 				
 				states_depth.append(image)
 				
 			counter += 1
-		face_state = [1,0]
-		if face_count > 4:
-			face_state = [0,1]
+		emotion = self.most_common(face_count)
 
-		face_state = torch.FloatTensor(face_state).unsqueeze(0)
-		
+		emotion_one_hot = self.get_one_hot_vector(emotion)
+		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
 		s = self.pre_process(states_gray)
 		d = None
 		if(self.use_depth_state):
@@ -301,6 +306,9 @@ class Environment:
 			s = d
 		s = [s,face_state]
 		return s,d
+
+	def most_common(self,lst):
+		return max(set(lst), key=lst.count)
 
 	def receive_image(self,size):
 		read = 0
