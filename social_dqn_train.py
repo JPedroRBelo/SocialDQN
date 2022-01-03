@@ -165,7 +165,7 @@ def main(cfg):
 
 
 
-    save_social_signals = params['save_social_states']
+    save_social_states = params['save_social_states']
 
     save_images = params['save_images']
     solved_score = params['solved_score']
