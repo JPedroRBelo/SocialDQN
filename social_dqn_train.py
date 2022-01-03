@@ -15,6 +15,9 @@ from PIL import Image
 from torchvision.utils import save_image
 from datetime import datetime
 
+from utils.print_colors import *
+
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
@@ -33,6 +36,11 @@ def save_action_reward_history(actions_rewards):
     dirr = 'scores/'
     file = 'action_reward_history.dat'
     torch.save(actions_rewards,dirr+file)
+
+def save_social_signals_states(social_signals):
+    dirr = 'scores/'
+    file = 'social_signals_history.dat'
+    torch.save(social_signals,dirr+file)
 
 
 def save_image_thread(ep,step,name,images):
@@ -103,7 +111,7 @@ def erase_folder(folder):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+            error('Failed to delete %s. Reason: %s' % (file_path, e))
 
 def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
@@ -140,16 +148,24 @@ def save_train_files(cfg,notes=""):
             f.write(notes)
 
 
+def check_consistency_in_configuration_parameters(prm):
+    if(prm['save_images']):
+         warning("Saving images can cause training latency and consume large disk space.")
 
 
 
 def main(cfg):
+    #
+    
     # Initialize environment object
     parsed_args = parse_arguments()
     params = cfg.PARAMETERS['SimDRLSR']
+    check_consistency_in_configuration_parameters(params)
     env_name = params['env_name']
 
 
+
+    save_social_signals = params['save_social_states']
 
     save_images = params['save_images']
     solved_score = params['solved_score']
@@ -195,9 +211,11 @@ def main(cfg):
     scores = []                                 # list containing scores from each episode
     scores_window = deque(maxlen=scores_window_size)   # last (window_size) scores
     actions_rewards = []
+    social_signals = []
 
     for i_episode in range(1, episodes+1):
         ep_actions_rewards = []
+        ep_social_state = []
         # Reset the environment
         env.reset()
 
@@ -229,6 +247,9 @@ def main(cfg):
             memory.push(gray_state, action, reward, next_gray_state, done)
 
             ep_actions_rewards.append([action,reward])
+            if(save_social_states):
+                ep_social_state.append(gray_state[1])
+                warning(str(gray_state[1]))
             # Update Q-Learning
             step += 1
             if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start:
@@ -255,6 +276,8 @@ def main(cfg):
 
         # Push to score list
         actions_rewards.append( ep_actions_rewards)
+        if(save_social_states):
+            social_signals.append(ep_social_state)
         scores_window.append(score)
         scores.append([score, np.mean(scores_window), np.std(scores_window)])
         plot(scores,agent.name,params,i_episode,save=False)
@@ -280,6 +303,8 @@ def main(cfg):
     df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
     df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],i_episode), sep=',',index=False)
     save_action_reward_history(actions_rewards)
+    if(save_social_states):
+        save_social_signals_states(social_signals)
     agent.export_network('models/%s_%s'% (agent.name,env_name))
     plot(scores,agent.name,params,episodes+1,save=True)
     # Close environment    
