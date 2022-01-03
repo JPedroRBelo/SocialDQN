@@ -249,7 +249,6 @@ def main(cfg):
             ep_actions_rewards.append([action,reward])
             if(save_social_states):
                 ep_social_state.append(gray_state[1])
-                warning(str(gray_state[1]))
             # Update Q-Learning
             step += 1
             if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start:
