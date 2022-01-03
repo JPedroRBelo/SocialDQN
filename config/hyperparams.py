@@ -26,19 +26,19 @@ PARAMETERS = {
         'stop_when_solved':     False,
 
         #Multimodal DQN: get detph states
-        'use_depth_state':      True,
-        'use_only_depth_state': True,
+        'use_depth_state':      False,
+        'use_only_depth_state': False,
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         'social_state_size':    4,
         'nstates_social':       [256],
         'emotional_states':     ['no_face','neutral','positive','negative'],
 
 
 
-        'replay_size':          50000,             # replay buffer size
+        'replay_size':          75000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize

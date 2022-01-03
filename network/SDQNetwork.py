@@ -18,6 +18,8 @@ class DQN(nn.Module):
 		self.poolsize=params['poolsize']
 		self.enable_social_signs=params['enable_social_signs']
 		self.nstates_social = params['nstates_social']
+		self.social_state_size = params['social_state_size']
+
 		self.features = nn.Sequential(
 			nn.Conv2d(in_channels=self.nfeats,out_channels=self.nstates[0], kernel_size=self.kernels[0],stride=self.strides[0],padding=1),
 			nn.BatchNorm2d(self.nstates[0]),
@@ -35,7 +37,7 @@ class DQN(nn.Module):
 
 		
 		self.linear = nn.Sequential(
-			nn.Linear(2, 256),
+			nn.Linear(self.social_state_size, 256),
 			nn.ReLU()
 		)
 
