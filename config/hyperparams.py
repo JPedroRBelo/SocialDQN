@@ -72,7 +72,7 @@ PARAMETERS = {
         'hs_fail_reward':       -0.2,
         'eg_success_reward':    0,
         'eg_fail_reward':       -0.1,
-        'ep_fail_reward':       -1
+        'ep_fail_reward':       0
     },
 }
 # -------------------------------------------------------------------- #
