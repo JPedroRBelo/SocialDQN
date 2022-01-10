@@ -625,8 +625,8 @@ def main():
 	#75k rb
 	folders.append('results/20220103_083937')
 	#50k rb 20211229_034231
-	labels.append("Emotions 50k")
-	folders.append('results/20211229_034231')
+	#labels.append("Emotions 50k")
+	#folders.append('results/20211229_034231')
 
 
 	
@@ -686,7 +686,6 @@ def main():
 				break;			
 			else:
 				print('\nIncorrect key...')
-
 
 
 

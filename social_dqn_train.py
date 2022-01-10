@@ -316,5 +316,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###Testing SimDRLSR v0.320####\nSocialDQN\nEmotion groups. Fouth Test. Saving social signals states. 7,5k Eps. RB 75k'
+    notes = '###Testing SimDRLSR v0.320####\nSocialDQN\nSimulator with emotions. SocialDQN only with face state, without emotions info'
     save_train_files(cfg,notes)

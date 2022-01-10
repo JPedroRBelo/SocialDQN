@@ -41,10 +41,15 @@ class Environment:
 		self.ep_fail_reward = params['ep_fail_reward']
 		self.use_depth_state = params['use_depth_state']
 		self.blind_mode = params['blind_mode']
+		self.social_state_size = params['social_state_size']
 		self.use_only_depth_state = params['use_only_depth_state']
 		self.emotional_states = params['emotional_states']
+		self.facial_states = params['facial_states']
 		series = pd.Series(self.emotional_states)
+		if(social_state_size==2):
+			series = pd.Series(self.facial_states)
 		self.one_hot_vectors = pd.get_dummies(series)
+		self.emotional_states = params['facial_states']
 		
 		self.params = params
 		self.step = 0
@@ -286,9 +291,25 @@ class Environment:
 					if msg:				
 						face = msg.replace('\n','')
 					break
+				'''
 				if(face in self.emotional_states):
 					face_count.append(face)
+				'''
+				if(social_state_size==2):
+					if(face in self.emotional_states):
+						aux = min(self.emotional_states.index(face),(n-1))
+						blue(str(aux))
+						face_count.append(face) = self.facial_states[aux]
+						
+					elif(face in facial_states):
+						face_count.append(face)
+
+				else:
+					if(face in self.emotional_states):
+						face_count.append(face)
+				print(face)
 				states_gray.append(image)
+
 			else:
 				
 				states_depth.append(image)
