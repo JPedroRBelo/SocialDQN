@@ -17,3 +17,29 @@ from utils.print_colors import *
 error('Testando')
 blue('Teste azul')
 header('header')
+
+
+emotional_states =  ['no_face','neutral','positive','negative']
+facial_states = ['no_face','face']
+
+n = 4
+face = 'positive'
+result = 'none'
+
+if(n==2):
+	if(face in emotional_states):
+		aux = min(emotional_states.index(face),(n-1))
+		blue(str(aux))
+		result = facial_states[aux]
+		
+	elif(face in facial_states):
+		result = face
+	else:
+		error('error')
+
+else:
+	if(face in emotional_states):
+		result = face
+
+
+print(result)
