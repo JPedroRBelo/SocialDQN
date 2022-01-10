@@ -46,7 +46,7 @@ class Environment:
 		self.emotional_states = params['emotional_states']
 		self.facial_states = params['facial_states']
 		series = pd.Series(self.emotional_states)
-		if(social_state_size==2):
+		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
 		self.one_hot_vectors = pd.get_dummies(series)
 		self.emotional_states = params['facial_states']
@@ -295,13 +295,13 @@ class Environment:
 				if(face in self.emotional_states):
 					face_count.append(face)
 				'''
-				if(social_state_size==2):
+				if(self.social_state_size==2):
 					if(face in self.emotional_states):
-						aux = min(self.emotional_states.index(face),(n-1))
-						blue(str(aux))
-						face_count.append(face) = self.facial_states[aux]
+						aux = min(self.emotional_states.index(face),(self.social_state_size-1))
+
+						face_count.append(self.facial_states[aux])
 						
-					elif(face in facial_states):
+					elif(face in self.facial_states):
 						face_count.append(face)
 
 				else:
@@ -319,6 +319,7 @@ class Environment:
 
 		emotion_one_hot = self.get_one_hot_vector(emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
+		print(face_state)
 		s = self.pre_process(states_gray)
 		d = None
 		if(self.use_depth_state):
