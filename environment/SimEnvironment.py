@@ -306,7 +306,7 @@ class Environment:
 				else:
 					if(face in self.emotional_states):
 						face_count.append(face)
-				print(face)
+				print(face_count[-1])
 				states_gray.append(image)
 
 			else:
