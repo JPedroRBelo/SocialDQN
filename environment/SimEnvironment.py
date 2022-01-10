@@ -49,7 +49,6 @@ class Environment:
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
 		self.one_hot_vectors = pd.get_dummies(series)
-		self.emotional_states = params['emotional_states']
 		
 		self.params = params
 		self.step = 0
