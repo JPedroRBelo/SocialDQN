@@ -306,7 +306,6 @@ class Environment:
 				else:
 					if(face in self.emotional_states):
 						face_count.append(face)
-				print(face_count[-1])
 				states_gray.append(image)
 
 			else:
@@ -318,7 +317,6 @@ class Environment:
 
 		emotion_one_hot = self.get_one_hot_vector(emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
-		print(face_state)
 		s = self.pre_process(states_gray)
 		d = None
 		if(self.use_depth_state):
