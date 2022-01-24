@@ -34,7 +34,7 @@ PARAMETERS = {
         #Social DQN params
         'enable_social_signs':  True,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
-        'social_state_size':    2,
+        'social_state_size':    4,
         'nstates_social':       [256],
         'emotional_states':     ['no_face','neutral','positive','negative'],
         'facial_states':        ['no_face','face'],

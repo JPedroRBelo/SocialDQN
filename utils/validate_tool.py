@@ -747,12 +747,18 @@ def main(save=False):
 	#labels.append("Emotions 50k")
 	#folders.append('results/20211229_034231')
 
-	labels.append("Fail Reward: Neutral - Emotions")
+	#labels.append("Fail Reward: Neutral - Emotions")
 	#75k rb
-	folders.append('results/20220108_182042')
+	#folders.append('results/20220108_182042')
 
 	labels.append("Only face state (no emotions). Sim with emotions")
 	folders.append('results/20220115_101708')
+
+
+	labels.append("Only face state (no emotions). Sim with emotions 2")
+	folders.append('results/20220122_150759')
+
+
 
 	
 	
@@ -959,7 +965,7 @@ def main2(save=True):
 					print('\nIncorrect key...')
 
 if __name__ == "__main__":
-	main2(save=True)
+	main(save=True)
 
 
 
