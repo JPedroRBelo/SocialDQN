@@ -1,0 +1,4 @@
+Only face state (no emotions). Sim with emotions
+results/20220115_101708
+Only face state (no emotions). Sim with emotions 2
+results/20220122_150759
