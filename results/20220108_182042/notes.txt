@@ -1,3 +1,3 @@
 ###Testing SimDRLSR v0.320####
 SocialDQN
-Emotion groups. Fouth Test. Saving social signals states. 7,5k Eps. RB 75k
+Emotion groups. Fouth Test. With Emotions. 7,5k Eps. RB 75k. 'ep_fail_reward':0
