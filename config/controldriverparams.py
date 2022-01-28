@@ -1,9 +1,6 @@
 # -------------------------------------------------------------------- #
 # Hyperparameters
 # -------------------------------------------------------------------- #
-# -------------------------------------------------------------------- #
-# Hyperparameters
-# -------------------------------------------------------------------- #
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
@@ -24,6 +21,7 @@ PARAMETERS = {
         'scores_window_size':   100,
         'train_episodes':       15000,
         'save_images':          False,
+        'save_social_states':   False,
         'solved_score':         0.9,
         'stop_when_solved':     False,
 
@@ -33,9 +31,12 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
-        'social_state_size':    2,
+        'enable_social_signs':  True,
+        #Social State Sizes: 4 = emotional states; 2 = facial_states
+        'social_state_size':    4,
         'nstates_social':       [256],
+        'emotional_states':     ['no_face','neutral','positive','negative'],
+        'facial_states':        ['no_face','face'],
 
 
 

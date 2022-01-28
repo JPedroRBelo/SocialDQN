@@ -36,6 +36,7 @@ PARAMETERS = {
         'social_state_size':    4,
         'nstates_social':       [256],
         'emotional_states':     ['no_face','neutral','positive','negative'],
+        'facial_states':        ['no_face','face'],
 
 
 

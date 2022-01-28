@@ -5,7 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import config.config as cfg
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class DQN(nn.Module):
 	def __init__(self,params):
