@@ -749,10 +749,21 @@ def main(save=False):
 
 	#labels.append("Fail Reward: Neutral - Emotions")
 	#75k rb
+
 	#folders.append('results/20220108_182042')
+	
+
+
+
+	#20220105_223402
+
 
 	labels.append("Only face state (no emotions). Sim with emotions")
-	folders.append('results/20220115_101708')
+	folders.append('results/20220105_223402')
+
+
+	#labels.append("Only face state (no emotions). Sim with emotions")
+	#folders.append('results/20220115_101708')
 
 
 	labels.append("Only face state (no emotions). Sim with emotions 2")

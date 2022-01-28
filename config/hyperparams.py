@@ -12,7 +12,6 @@ PARAMETERS = {
         'frame_height':         320,
         'frame_width':          240,
         'frame_size':           198,
-        #'frame_size':           84,
         'port':                 12375,
         'host':                 '127.0.0.1',
         'actions_names':        ['Wait','Look','Wave','Handshake'],

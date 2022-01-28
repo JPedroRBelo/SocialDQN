@@ -134,7 +134,7 @@ class Environment:
 
 	def get_tensor_from_image(self,screen):
 		convert = T.Compose([T.ToPILImage(),
-			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=Image.BILINEAR),
+			T.Resize((self.proc_frame_size,self.proc_frame_size), interpolation=T.InterpolationMode.BILINEAR),
 			T.ToTensor()])
 		screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
 		screen = torch.from_numpy(screen)
@@ -269,7 +269,7 @@ class Environment:
 			while True:
 				if(image == None):
 					n_tries += 1
-					print("Image error: ",str(i))
+					#print("Image error: ",str(i))
 					self.socket.send('last_image'.encode())
 					data_img= self.receive_image(size)
 					image = self.convert_to_image(data_img)

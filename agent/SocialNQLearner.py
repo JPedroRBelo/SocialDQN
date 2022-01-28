@@ -11,7 +11,8 @@ import torch.optim as optim
 
 from network.SDQNetwork import *
 import torch.nn as nn
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 # -------------------------------------------------------------------- #
