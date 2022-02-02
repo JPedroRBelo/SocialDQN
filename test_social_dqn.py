@@ -375,7 +375,7 @@ def just_run(steps=30,restart_done=True):
 
 
 def customized_params(params):
-    params['simulation_speed'] = 10
+    params['simulation_speed'] = 1
     params['save_social_states'] = True
     params['save_images'] = True
     return params 

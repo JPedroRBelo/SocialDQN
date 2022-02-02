@@ -1,5 +1,6 @@
 from utils.misc import *
 import math
+from threading import Thread
 # Config
 #from agent.DoubleQLearner import Agent
 from agent.SocialNQLearner import Agent
@@ -61,17 +62,17 @@ def plot(scores,name,params,i_episode,save=False):
 
 
     ax = fig.add_subplot(111)
-    episode = np.arange(len(scores))
-    plt.plot(episode,df['average_scores'])
-    plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
+    episode = np.arange(i_episode)
+    plt.plot(episode,df['average_scores'][:i_episode])
+    plt.fill_between(episode,df['average_scores'][:i_episode].add(df['std'][:i_episode]),df['average_scores'][:i_episode].sub(df['std'][:i_episode]),alpha=0.3)
     plt.title(params['env_name'])
     ax.legend([name + ' [ Average scores ]'])
     plt.ylabel('Score')
     plt.xlabel('Episode')
-    if(df['average_scores'].size<=1):
+    if(df['average_scores'][:i_episode].size<=1):
         max_total_fails = params['hs_fail_reward']*params['t_steps']
     else:
-        max_total_fails = min(df['scores'].min(),df['average_scores'].min())
+        max_total_fails = min(df['scores'][:i_episode].min(),df['average_scores'][:i_episode].min())
     if max_total_fails < 0:
          max_total_fails = int(math.floor(max_total_fails))
          max_total_success = 1.5 
@@ -163,21 +164,15 @@ def main(cfg):
     check_consistency_in_configuration_parameters(params)
     env_name = params['env_name']
 
-
-
-    save_social_states = params['save_social_states']
-
-    save_images = params['save_images']
     solved_score = params['solved_score']
     stop_when_solved = params['stop_when_solved']
 
     start_simulator = False
     if(not parsed_args.sim==''):
         start_simulator = True
-    env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator)
 
     # Reset the environment
-    env_info = env.reset()
+
 
     # Get environment parameter
     number_of_agents = params['number_of_agents']
@@ -188,6 +183,12 @@ def main(cfg):
     print('Number of agents  : ', number_of_agents)
     print('Number of actions : ', action_size)
     print('Dimension of state space : ', state_size)
+
+
+
+
+
+
 
     # Initialize agent
     agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
@@ -208,12 +209,80 @@ def main(cfg):
     epsilon_decay = params['epsilon_decay']     # factor for decreasing epsilon
 
     """ Training loop  """
-    scores = []                                 # list containing scores from each episode
+                       
     scores_window = deque(maxlen=scores_window_size)   # last (window_size) scores
-    actions_rewards = []
-    social_signals = []
+    scores = [[0, 0, 0]] * episodes      
+    actions_rewards = [None] * episodes  
+    social_signals = [None] * episodes  
 
-    for i_episode in range(1, episodes+1):
+
+
+    envs = []
+    for i in range(number_of_agents):
+        envs.append(Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i))
+        #envs[-1].reset()
+
+    threads_agents = [None] * number_of_agents
+    queue_episodes = deque(range(episodes))
+    ep_count = 0;
+
+
+    while ep_count<episodes:
+
+
+        for i in range(len(threads_agents)):
+            if(threads_agents[i]!=None):
+                if(not threads_agents[i].is_alive()):
+                    ep_count+=1
+                    epsilon = max(epsilon_floor, epsilon*epsilon_decay)
+                    plot(scores,agent.name,params,ep_count,save=False)
+
+
+                    if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
+                        # Recall experiences (miniBatch)
+                        experiences = memory.recall()
+                        # Train agent
+                        agent.learn(experiences)
+                        print('\r#Training step:{}'.format(ep_count), end="")
+
+                    if(len(queue_episodes)>0):
+                        ep_at = queue_episodes.popleft()
+                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                        #threads.append(t)
+                        threads_agents[i].start()
+                    else:
+                        threads_agents[i] = None
+            else:
+                if(len(queue_episodes)>0):
+                    ep_at = queue_episodes.popleft()
+                    threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                    #threads.append(t)
+                    threads_agents[i].start()
+
+              
+
+
+
+
+
+    # Export scores to csv file
+    df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
+    df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],i_episode), sep=',',index=False)
+    save_action_reward_history(actions_rewards)
+    if(save_social_states):
+        save_social_signals_states(social_signals)
+    agent.export_network('models/%s_%s'% (agent.name,env_name))
+    plot(scores,agent.name,params,ep_count,save=True)
+    # Close environment  
+    for env in envs:  
+        env.close_connection()
+
+
+def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals):
+        train_after_episodes = params['train_after_episodes']
+        save_social_states = params['save_social_states']
+        save_images = params['save_images']    
+        update_interval = params['update_interval']
         ep_actions_rewards = []
         ep_social_state = []
         # Reset the environment
@@ -264,22 +333,13 @@ def main(cfg):
 
             # Update total score
             score += reward
-            
+      
 
-        if (train_after_episodes) and (i_episode % update_interval) == 0 and len(memory) > replay_start:
-            # Recall experiences (miniBatch)
-            experiences = memory.recall()
-            # Train agent
-            agent.learn(experiences)
-            #print('\r#Training step:{}'.format(step), end="")
-
-        # Push to score list
-        actions_rewards.append( ep_actions_rewards)
+        actions_rewards[i_episode] =  ep_actions_rewards
         if(save_social_states):
-            social_signals.append(ep_social_state)
+            social_signals[i_episode] =  ep_social_state
         scores_window.append(score)
-        scores.append([score, np.mean(scores_window), np.std(scores_window)])
-        plot(scores,agent.name,params,i_episode,save=False)
+        scores[i_episode] = [score, np.mean(scores_window), np.std(scores_window)]
 
         # Print episode summary
         print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon), end="")
@@ -287,28 +347,15 @@ def main(cfg):
             print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
+        '''
         if (np.mean(scores_window)>=solved_score)and stop_when_solved:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
             #pass
-            break                
+            trained = True;           
+        '''     
 
-
-        # Update exploration
-        epsilon = max(epsilon_floor, epsilon*epsilon_decay)
-    """ End of the Training """
-
-    # Export scores to csv file
-    df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
-    df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],i_episode), sep=',',index=False)
-    save_action_reward_history(actions_rewards)
-    if(save_social_states):
-        save_social_signals_states(social_signals)
-    agent.export_network('models/%s_%s'% (agent.name,env_name))
-    plot(scores,agent.name,params,episodes+1,save=True)
-    # Close environment    
-    env.close_connection()
-
+        
 
 
 if __name__ == "__main__":    
