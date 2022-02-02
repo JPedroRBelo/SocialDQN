@@ -4,14 +4,17 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     3,
-        'number_of_agents':     1,
+        'simulation_speed':     1,
+        'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
-        't_steps':              20,
+        't_steps':              25,
+        'screen_width':         320,
+        'screen_height':        240,
         'frame_height':         320,
         'frame_width':          240,
         'frame_size':           198,
+        'quality':              "very low",
         'port':                 12375,
         'host':                 '127.0.0.1',
         'actions_names':        ['Wait','Look','Wave','Handshake'],
@@ -19,7 +22,7 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       15000,
+        'train_episodes':       1000,
         'save_images':          False,
         'save_social_states':   True,
         'solved_score':         0.9,
@@ -40,7 +43,7 @@ PARAMETERS = {
 
 
 
-        'replay_size':          75000,             # replay buffer size
+        'replay_size':          50000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
@@ -60,7 +63,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           128,                  # minibatch size
+        'batch_size':           64,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
@@ -73,7 +76,7 @@ PARAMETERS = {
         'hs_fail_reward':       -0.2,
         'eg_success_reward':    0,
         'eg_fail_reward':       -0.1,
-        'ep_fail_reward':       -1
+        'ep_fail_reward':       0
     },
 }
 # -------------------------------------------------------------------- #

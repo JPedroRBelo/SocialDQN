@@ -21,7 +21,7 @@ import pandas as pd
 
 
 class Environment:
-	def __init__(self,params,simulator_path='',start_simulator=False,verbose=False,epi=0):
+	def __init__(self,params,simulator_path='',start_simulator=False,verbose=False,epi=0,port=0):
 		# if gpu is to be used
 		self.device = params['device']
 		#self.r_len=8
@@ -53,7 +53,9 @@ class Environment:
 		self.params = params
 		self.step = 0
 		self.SocialSigns = SocialSigns()
-
+		self.port = self.params['port']
+		if(port!=0):
+			self.port = port
 		self.process = Popen('false')		
 		signal.signal(signal.SIGINT, self.signalHandler)
 
@@ -68,19 +70,21 @@ class Environment:
 			
 			command = './'+name+'.x86_64'			
 			command = abspath(join(folder,command))
-			self.init_simulator(command)
+			par = ' -screen-width '+str(params['screen_width'])
+			par += ' -screen-height '+str(params['screen_height'])
+			par += ' -port '+str(port)
+			self.init_simulator(command+par)
 		self.socket,self.client = self.__connect()	
 		self.set_configuration()
 
 	def __connect(self):
-		skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		port = self.params['port']		
+		skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)	
 		host=self.params['host']
 		flag_connection = False	
 		count = 0	
 		while(not flag_connection):
 			try:
-				client =skt.connect((host, port))
+				client =skt.connect((host, self.port))
 				flag_connection = True
 				return skt,client
 			except socket.error:
@@ -364,7 +368,7 @@ class Environment:
 
 	def openSim(self,command,process):
 		process.terminate()
-		process = Popen(command)
+		process = Popen(command, shell=True)
 		return process
 
 	def killSim(self,process):
