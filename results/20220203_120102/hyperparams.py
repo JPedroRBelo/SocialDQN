@@ -5,7 +5,7 @@ PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
         'simulation_speed':     1,
-        'number_of_agents':     15,
+        'number_of_agents':     1,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -22,7 +22,7 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       15000,
+        'train_episodes':       0,
         'save_images':          False,
         'save_social_states':   True,
         'solved_score':         0.9,
