@@ -269,6 +269,7 @@ def main(cfg):
     df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
     df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
     save_action_reward_history(actions_rewards)
+    save_social_states = params['save_social_states']
     if(save_social_states):
         save_social_signals_states(social_signals)
     agent.export_network('models/%s_%s'% (agent.name,env_name))
