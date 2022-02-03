@@ -13,6 +13,8 @@ from PIL import Image
 import signal
 import subprocess
 from subprocess import Popen
+import os
+import signal
 from os.path import abspath, dirname, join
 from utils.SocialSigns import SocialSigns
 import pandas as pd
@@ -368,11 +370,12 @@ class Environment:
 
 	def openSim(self,command,process):
 		process.terminate()
-		process = Popen(command, shell=True)
+		process = Popen(command, shell=True, preexec_fn=os.setsid)
 		return process
 
 	def killSim(self,process):
-		process.terminate()		
+		process.terminate()
+		os.killpg(os.getpgid(process.pid), signal.SIGTERM)		
 		#time.sleep(1)
 
 	def signalHandler(self,sig, frame):

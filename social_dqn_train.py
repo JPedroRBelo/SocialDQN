@@ -259,9 +259,8 @@ def main(cfg):
                     #threads.append(t)
                     threads_agents[i].start()
 
-              
-
-
+    for env in envs:  
+        env.close_connection()
 
 
 
@@ -273,10 +272,10 @@ def main(cfg):
     if(save_social_states):
         save_social_signals_states(social_signals)
     agent.export_network('models/%s_%s'% (agent.name,env_name))
-    plot(scores,agent.name,params,ep_count,save=True)
+    if(ep_count):
+        plot(scores,agent.name,params,ep_count,save=True)
     # Close environment  
-    for env in envs:  
-        env.close_connection()
+
 
 
 def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals):
@@ -364,5 +363,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###Testing SimDRLSR v0.321####\nSocialDQN\nSimulator with emotions. Emotions. 15000 eps. Fail EP rewards = -1. Simspeed = 3'
+    notes = '###Testing SimDRLSR v0.321####\nSocialDQN\nSimulator with emotions. Batch: 64. Emotions. 15000 eps. Fail EP rewards = 0. Simspeed = 1. N agents 10'
     save_train_files(cfg,notes)
