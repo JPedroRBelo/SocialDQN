@@ -248,7 +248,7 @@ def main(cfg):
                 if(threads_agents[i]!=None):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
                     thread_log += ' #THREAD {}: {}'.format(i, alive)
-                    thread_alive_time = (time.time() - threads_times[i])%60
+                    thread_alive_time = (time.time() - threads_times[i])
                     if(not threads_agents[i].is_alive()):
                         ep_count+=1
                         epsilon = max(epsilon_floor, epsilon*epsilon_decay)
