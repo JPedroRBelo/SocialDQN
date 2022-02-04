@@ -300,6 +300,7 @@ class Environment:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if data:
 				if("reward" in data):
+					original_data = str(data)
 					data = data. replace("reward", "")
 					data = data. replace(" ", "")
 					reward = float(data.replace(',','.'))
@@ -308,7 +309,7 @@ class Environment:
 						terminal = True
 						reward = self.ep_fail_reward
 					self.step += 1
-					print("Reward: "+str(reward))
+					print("Reward: "+str(original_data))
 					return reward,terminal		
 		print("Reward errado")		
 		return 0
