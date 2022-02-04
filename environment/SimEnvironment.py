@@ -195,9 +195,13 @@ class Environment:
 		self.socket.send(data.encode())
 
 		while True:
-			msg = self.socket.recv(1024).decode()
-			if msg:				
-				return float(msg.replace(',','.').replace('\n',''))
+			msg = self.socket.recv(1024)
+			try:
+				msg = msg.decode()
+				if msg:				
+					return float(msg.replace(',','.').replace('\n',''))
+			except Exception:
+        		continue
 			break
 		return 0
 
@@ -300,10 +304,14 @@ class Environment:
 				self.socket.send('next_emotion'.encode())
 				face = 'no_face'
 				while True:
-					msg = self.socket.recv(1024).decode()
-					if msg:				
-						face = msg.replace('\n','')
-					break
+					try:
+						msg = self.socket.recv(1024).decode()
+						if msg:				
+							face = msg.replace('\n','')
+						break
+					except Exception:
+						print("Socket Error")
+						return None,None
 				'''
 				if(face in self.emotional_states):
 					face_count.append(face)
