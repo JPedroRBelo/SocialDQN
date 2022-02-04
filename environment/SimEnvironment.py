@@ -61,6 +61,7 @@ class Environment:
 			self.port = port
 		self.process = Popen('false')		
 		signal.signal(signal.SIGINT, self.signalHandler)
+		self.debug= False;
 
 		if(start_simulator):
 			name = params['env_name']
