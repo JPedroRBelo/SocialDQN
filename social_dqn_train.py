@@ -248,7 +248,7 @@ def main(cfg):
 
             thread_log = ""
             for i in range(len(threads_agents)):
-                env[i].setDebut( threads_at_ep)
+                envs[i].setDebug(threads_at_ep[i])
                 if(threads_agents[i]!=None):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
                     thread_log += ' #THREAD {}: {}'.format(i, alive)
