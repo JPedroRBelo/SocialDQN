@@ -206,6 +206,7 @@ class Environment:
 						return float(msg.replace(',','.').replace('\n',''))
 
 				except Exception:
+					print("Config simulator Exception")
 					continue
 
 				break
