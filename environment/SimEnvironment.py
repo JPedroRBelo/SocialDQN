@@ -197,7 +197,8 @@ class Environment:
 			self.socket.send(data.encode())
 			time_start = time.time();
 			time_now = time.time();
-			while (time_now - time_start)<10:
+			print("Data sended...")
+			while (time_now - time_start)<1:
 				msg = self.socket.recv(1024)
 				time_now = time.time();
 				try:
@@ -371,7 +372,7 @@ class Environment:
 
 	def reset(self):
 		self.config_simulation("reset","Reseting")
-		time.sleep(3)
+		time.sleep(10)
 
 		self.close()
 		self.connect()
