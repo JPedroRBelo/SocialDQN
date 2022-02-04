@@ -309,9 +309,9 @@ class Environment:
 						terminal = True
 						reward = self.ep_fail_reward
 					self.step += 1
-					print("Reward: "+str(original_data))
+					#print("Reward: "+str(original_data)+ "converted "+str(reward))
 					return reward,terminal		
-		print("Reward errado")		
+	
 		return 0
 
 	'''
@@ -464,21 +464,24 @@ class Environment:
 				break
 		return recv	
 
-	def reset(self):
-		result = self.reseting_simulation()
-		if(result==-1):
-			print("Can't connect with simulator")
-			return 0
-		elif(result == 0):
-			self.reseting_simulation()
-		else:
-			time.sleep(3)
-			print("Reseted!")
-			self.close()
-			self.connect()
-			self.step = 0
-			self.set_configuration()
-			return 1
+	def reset(self,restart_simulator=True):
+		self.step = 0
+		if(restart_simulator):
+			result = self.reseting_simulation()
+			if(result==-1):
+				print("Can't connect with simulator")
+				return 0
+			elif(result == 0):
+				self.reseting_simulation()
+			else:
+				time.sleep(3)
+				print("Reseted!")
+				self.close()
+				self.connect()				
+				self.set_configuration()
+				return 1
+
+
 	
 	def close_connection(self):
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
