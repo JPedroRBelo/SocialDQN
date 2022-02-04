@@ -360,7 +360,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         # One episode loop
         step = 0
         while not done:
-            env.reset(restart_simulator=False)
+            
             # Action selection by Epsilon-Greedy policy
             action = agent.eGreedy(gray_state,epsilon)
             #action = agent.select_action(gray_state,depth_state)            
