@@ -248,7 +248,7 @@ def main(cfg):
 
             thread_log = ""
             for i in range(len(threads_agents)):
-              
+                env[i].setDebut( threads_at_ep)
                 if(threads_agents[i]!=None):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
                     thread_log += ' #THREAD {}: {}'.format(i, alive)
@@ -278,7 +278,7 @@ def main(cfg):
                             threads_agents[i] = None
                     elif(thread_alive_time > max_thread_time):
                         #print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
-                        env[i].setDebut( threads_at_ep)
+                        
                         #threads_agents[i].daemon()
                         '''
                         print("Reseting")
