@@ -199,9 +199,11 @@ class Environment:
 				try:
 					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					reward_value = float(reward.replace(',','.'))
+					print(reward_value)
 					return reward_value
 				except (ValueError, TypeError):
 					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+					print("Reward error")
 					continue				
 			break
 		return 0
