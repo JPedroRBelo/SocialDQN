@@ -232,7 +232,7 @@ def main(cfg):
         threads_at_ep = [None] * number_of_agents
         queue_episodes = deque(range(episodes))
         ep_count = 0;
-        max_thread_time = ((params['t_steps'] * 10) / params['simulation_speed'])+30
+        max_thread_time = ((params['t_steps'] * 5) / params['simulation_speed'])+30
 
         #stdscr = curses.initscr()
 
