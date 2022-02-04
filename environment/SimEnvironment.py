@@ -193,7 +193,7 @@ class Environment:
 			print('{} Simulator: {}'.format(text,data))
 		done = False;
 		while not done:
-
+			print("sending config data")
 			self.socket.send(data.encode())
 			time_start = time.time();
 			time_now = time.time();
