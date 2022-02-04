@@ -241,7 +241,7 @@ def main(cfg):
         #stdscr = curses.initscr()
 
         
-        envs_fails = [0] * number
+        envs_fails = [0] * number_of_agents
 
 
         while ep_count<episodes:
