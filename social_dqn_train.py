@@ -273,8 +273,9 @@ def main(cfg):
                         else:
                             threads_agents[i] = None
                     elif(thread_alive_time > max_thread_time):
-                        print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"...")
+                        print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         #threads_agents[i].daemon()
+                        '''
                         print("Reseting")
                         result = envs[i].reset()
                         if(result==0):
@@ -294,6 +295,7 @@ def main(cfg):
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
                         print("New Thread running")
+                        '''
 
 
 
@@ -341,7 +343,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         ep_actions_rewards = []
         ep_social_state = []
         # Reset the environment
-        env.reset()
+        #env.reset()
 
         # Capture the current state
         gray_state,depth_state = env.get_screen()
