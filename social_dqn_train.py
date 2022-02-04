@@ -18,6 +18,9 @@ from datetime import datetime
 
 from utils.print_colors import *
 
+import curses
+import time
+
 
 
 def parse_arguments():
@@ -156,125 +159,143 @@ def check_consistency_in_configuration_parameters(prm):
 
 
 def main(cfg):
-    #
-    
-    # Initialize environment object
-    parsed_args = parse_arguments()
-    params = cfg.PARAMETERS['SimDRLSR']
-    check_consistency_in_configuration_parameters(params)
-    env_name = params['env_name']
-
-    solved_score = params['solved_score']
-    stop_when_solved = params['stop_when_solved']
-
-    start_simulator = False
-    if(not parsed_args.sim==''):
-        start_simulator = True
-
-    # Reset the environment
-
-
-    # Get environment parameter
-    number_of_agents = params['number_of_agents']
-    action_size = params['action_size']
-    state_size = params['state_size']
-    train_after_episodes = params['train_after_episodes']
-
-    print('Number of agents  : ', number_of_agents)
-    print('Number of actions : ', action_size)
-    print('Dimension of state space : ', state_size)
-
-
-
-
-
-
-
-    # Initialize agent
-    agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
-
-    # Initialize replay buffer
-    memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
-    update_interval = params['update_interval']
-    replay_start = params['replay_initial']
-
-    # Define parameters for training
-    episodes = params['train_episodes']         # maximum number of training episodes
-    stop_scores = params['stop_scores']
-    scores_window_size = params['scores_window_size']
-
-    # Define parameters for e-Greedy policy
-    epsilon = params['epsilon_start']           # starting value of epsilon
-    epsilon_floor = params['epsilon_final']     # minimum value of epsilon
-    epsilon_decay = params['epsilon_decay']     # factor for decreasing epsilon
-
-    """ Training loop  """
-                       
-    scores_window = deque(maxlen=scores_window_size)   # last (window_size) scores
-    scores = [[0, 0, 0]] * episodes      
-    actions_rewards = [None] * episodes  
-    social_signals = [None] * episodes  
-
-
-
     envs = []
-    for i in range(number_of_agents):
-        envs.append(Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i))
-        #envs[-1].reset()
+    try:
+        #
+        
+        # Initialize environment object
+        parsed_args = parse_arguments()
+        params = cfg.PARAMETERS['SimDRLSR']
+        check_consistency_in_configuration_parameters(params)
+        env_name = params['env_name']
 
-    threads_agents = [None] * number_of_agents
-    queue_episodes = deque(range(episodes))
-    ep_count = 0;
+        solved_score = params['solved_score']
+        stop_when_solved = params['stop_when_solved']
+
+        start_simulator = False
+        if(not parsed_args.sim==''):
+            start_simulator = True
+
+        # Reset the environment
 
 
-    while ep_count<episodes:
+        # Get environment parameter
+        number_of_agents = params['number_of_agents']
+        action_size = params['action_size']
+        state_size = params['state_size']
+        train_after_episodes = params['train_after_episodes']
+
+        print('Number of agents  : ', number_of_agents)
+        print('Number of actions : ', action_size)
+        print('Dimension of state space : ', state_size)
 
 
-        for i in range(len(threads_agents)):
-            if(threads_agents[i]!=None):
-                if(not threads_agents[i].is_alive()):
-                    ep_count+=1
-                    epsilon = max(epsilon_floor, epsilon*epsilon_decay)
-                    plot(scores,agent.name,params,ep_count,save=False)
 
 
-                    if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
-                        # Recall experiences (miniBatch)
-                        experiences = memory.recall()
-                        # Train agent
-                        agent.learn(experiences)
-                        print('\r#Training step:{}'.format(ep_count), end="")
 
+
+
+        # Initialize agent
+        agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
+
+        # Initialize replay buffer
+        memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
+        update_interval = params['update_interval']
+        replay_start = params['replay_initial']
+
+        # Define parameters for training
+        episodes = params['train_episodes']         # maximum number of training episodes
+        stop_scores = params['stop_scores']
+        scores_window_size = params['scores_window_size']
+
+        # Define parameters for e-Greedy policy
+        epsilon = params['epsilon_start']           # starting value of epsilon
+        epsilon_floor = params['epsilon_final']     # minimum value of epsilon
+        epsilon_decay = params['epsilon_decay']     # factor for decreasing epsilon
+
+        """ Training loop  """
+                           
+        scores_window = deque(maxlen=scores_window_size)   # last (window_size) scores
+        scores = [[0, 0, 0]] * episodes      
+        actions_rewards = [None] * episodes  
+        social_signals = [None] * episodes  
+
+
+
+
+        for i in range(number_of_agents):
+            envs.append(Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i))
+            #envs[-1].reset()
+
+        threads_agents = [None] * number_of_agents
+        queue_episodes = deque(range(episodes))
+        ep_count = 0;
+
+        #stdscr = curses.initscr()
+
+        
+        
+
+
+        while ep_count<episodes:
+
+            thread_log = ""
+            for i in range(len(threads_agents)):
+              
+                if(threads_agents[i]!=None):
+                    alive = "Running" if threads_agents[i].is_alive() else "Dead"
+                    thread_log += ' #THREAD {}: {}'.format(i, alive)
+                    
+                    if(not threads_agents[i].is_alive()):
+                        ep_count+=1
+                        epsilon = max(epsilon_floor, epsilon*epsilon_decay)
+                        plot(scores,agent.name,params,ep_count,save=False)
+
+
+                        if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
+                            # Recall experiences (miniBatch)
+                            experiences = memory.recall()
+                            # Train agent
+                            agent.learn(experiences)
+                            print('\r#Training step:{}'.format(ep_count), end="")
+
+                        if(len(queue_episodes)>0):
+                            ep_at = queue_episodes.popleft()
+                            threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                            #threads.append(t)
+                            threads_agents[i].start()
+                        else:
+                            threads_agents[i] = None
+                else:
+                    thread_log += ' #THREAD{}: NONE'.format(i)
                     if(len(queue_episodes)>0):
                         ep_at = queue_episodes.popleft()
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
                         #threads.append(t)
                         threads_agents[i].start()
-                    else:
-                        threads_agents[i] = None
-            else:
-                if(len(queue_episodes)>0):
-                    ep_at = queue_episodes.popleft()
-                    threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
-                    #threads.append(t)
-                    threads_agents[i].start()
+            #print(("\r"+thread_log),end="")
 
-    for env in envs:  
-        env.close_connection()
+        for env in envs:  
+            env.close_connection()
 
 
 
-    # Export scores to csv file
-    df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
-    df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
-    save_action_reward_history(actions_rewards)
-    save_social_states = params['save_social_states']
-    if(save_social_states):
-        save_social_signals_states(social_signals)
-    agent.export_network('models/%s_%s'% (agent.name,env_name))
-    if(ep_count):
-        plot(scores,agent.name,params,ep_count,save=True)
-    # Close environment  
+        # Export scores to csv file
+        df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
+        df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
+        save_action_reward_history(actions_rewards)
+        save_social_states = params['save_social_states']
+        if(save_social_states):
+            save_social_signals_states(social_signals)
+        agent.export_network('models/%s_%s'% (agent.name,env_name))
+        if(ep_count):
+            plot(scores,agent.name,params,ep_count,save=True)
+        # Close environment  
+    except KeyboardInterrupt:
+        for env in envs:  
+            env.close_connection()
+        print("Exiting...")
+        sys.exit()
 
 
 
@@ -343,8 +364,8 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
 
         # Print episode summary
         print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon), end="")
-        if i_episode % 100 == 0:
-            print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
+        #if i_episode % 100 == 0:
+            #print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
         '''
