@@ -266,6 +266,7 @@ def main(cfg):
                             ep_at = queue_episodes.popleft()
                             threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
                             #threads.append(t)
+                            threads_agents[i].setDaemon(True)  
                             threads_agents[i].start()
                             threads_times[i] = time.time()
                             threads_at_ep[i] = ep_at
@@ -279,6 +280,7 @@ def main(cfg):
                         envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                        threads_agents[i].setDaemon(True)  
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
@@ -291,6 +293,7 @@ def main(cfg):
                         ep_at = queue_episodes.popleft()
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
                         #threads.append(t)
+                        threads_agents[i].setDaemon(True)  
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
