@@ -308,7 +308,7 @@ class Environment:
 					if self.step >= self.params['t_steps']-1:
 						terminal = True
 						reward = self.ep_fail_reward
-					print("Ep: "+str(self.pi)+" step: "+str(self.step))
+					print("Ep: "+str(self.episode)+" step: "+str(self.step))
 					self.step += 1
 					#print("Reward: "+str(original_data)+ "converted "+str(reward))
 					return reward,terminal		
