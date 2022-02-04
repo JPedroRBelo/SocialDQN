@@ -232,6 +232,7 @@ class Environment:
 			time_now = time.time();
 			print("Data sended...")
 			while (time_now - time_start)<1:
+				print('waiting data')
 				msg = self.socket.recv(1024)
 				time_now = time.time();
 				try:
@@ -406,12 +407,15 @@ class Environment:
 		if(result==-1):
 			print("Can't connect with simulator")
 			return 0
+		elif(result == 0):
+			self.reseting_simulation()
 		else:
 			time.sleep(3)
+			print("Reseted!")
 			self.close()
 			self.connect()
 			self.step = 0
-			self.set_configuration()
+			self.s()
 			return 1
 	
 	def close_connection(self):
