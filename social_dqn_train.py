@@ -228,8 +228,11 @@ def main(cfg):
             #envs[-1].reset()
 
         threads_agents = [None] * number_of_agents
+        threads_times = [0] * number_of_agents
+        threads_at_ep = [None] * number_of_agents
         queue_episodes = deque(range(episodes))
         ep_count = 0;
+        max_thread_time = ((params['t_steps'] * 10) / params['simulation_speed'])+30
 
         #stdscr = curses.initscr()
 
@@ -245,7 +248,7 @@ def main(cfg):
                 if(threads_agents[i]!=None):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
                     thread_log += ' #THREAD {}: {}'.format(i, alive)
-                    
+                    thread_alive_time = (time.time() - threads_times[i])%60
                     if(not threads_agents[i].is_alive()):
                         ep_count+=1
                         epsilon = max(epsilon_floor, epsilon*epsilon_decay)
@@ -264,8 +267,24 @@ def main(cfg):
                             threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
                             #threads.append(t)
                             threads_agents[i].start()
+                            threads_times[i] = time.time()
+                            threads_at_ep[i] = ep_at
                         else:
                             threads_agents[i] = None
+                    elif(thread_alive_time > max_thread_time):
+                        print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"...")
+                        #threads_agents[i].daemon()
+                        envs[i].close_simulator()
+                        time.sleep(1)
+                        envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
+
+                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                        threads_agents[i].start()
+                        threads_times[i] = time.time()
+                        threads_at_ep[i] = ep_at
+
+
+
                 else:
                     thread_log += ' #THREAD{}: NONE'.format(i)
                     if(len(queue_episodes)>0):
@@ -273,6 +292,8 @@ def main(cfg):
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
                         #threads.append(t)
                         threads_agents[i].start()
+                        threads_times[i] = time.time()
+                        threads_at_ep[i] = ep_at
             #print(("\r"+thread_log),end="")
 
         for env in envs:  
