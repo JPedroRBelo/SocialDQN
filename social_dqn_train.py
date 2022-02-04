@@ -349,6 +349,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         ep_social_state = []
         # Reset the environment
         env.reset(restart_simulator=False)
+        env.episode = i_episode
 
         # Capture the current state
         
