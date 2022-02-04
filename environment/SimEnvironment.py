@@ -191,18 +191,26 @@ class Environment:
 
 		if self.verbose: 
 			print('{} Simulator: {}'.format(text,data))
-		
-		self.socket.send(data.encode())
+		done = False;
+		while not done:
 
-		while True:
-			msg = self.socket.recv(1024)
-			try:
-				msg = msg.decode()
-				if msg:				
-					return float(msg.replace(',','.').replace('\n',''))
-			except Exception:
-				continue
-			break
+			self.socket.send(data.encode())
+			time_start = time.time();
+			time_now = time.time();
+			while (time_now - time_start)<10:
+				msg = self.socket.recv(1024)
+				time_now = time.time();
+				try:
+					msg = msg.decode()
+					if msg:
+						return float(msg.replace(',','.').replace('\n',''))
+
+				except Exception:
+					continue
+
+				break
+
+
 		return 0
 
 	def is_final_state(self,action,reward):
@@ -362,7 +370,7 @@ class Environment:
 
 	def reset(self):
 		self.config_simulation("reset","Reseting")
-		time.sleep(5)
+		time.sleep(3)
 
 		self.close()
 		self.connect()
