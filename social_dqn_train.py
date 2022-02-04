@@ -241,7 +241,7 @@ def main(cfg):
         #stdscr = curses.initscr()
 
         
-        
+        envs_fails = [0] * number
 
 
         while ep_count<episodes:
@@ -269,10 +269,14 @@ def main(cfg):
 
                         else: 
                             queue_episodes.appendleft(threads_at_ep[i])
-
+                            envs_fails[i] += 1
+                            if(envs_fails[i]>=5):
+                                envs[i].close_connection()
+                                envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
+                                time.sleep(2)
                         if(len(queue_episodes)>0):
                             ep_at = queue_episodes.popleft()
-                            threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                            threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,id=i))
                             #threads.append(t)
                             threads_agents[i].setDaemon(True)  
                             threads_agents[i].start()
@@ -298,7 +302,7 @@ def main(cfg):
                         #time.sleep(1)
                         #envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
-                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,id=i))
                         print("Seting daemon...")
                         threads_agents[i].setDaemon(True)  
                         print("Starting new thread")
@@ -346,7 +350,7 @@ def main(cfg):
 
 
 
-def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals):
+def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,id=0):
         train_after_episodes = params['train_after_episodes']
         save_social_states = params['save_social_states']
         save_images = params['save_images']    
@@ -361,7 +365,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         try:
             gray_state,depth_state = env.get_screen()
         except:
-            print("Cant get states... Thread Exiting")
+            print("Cant get states... Thread "+str(id)+" Exiting")
             return 0
             
         # Reset score collector
@@ -378,7 +382,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
             try:         
                 next_gray_state,next_depth_state = env.get_screen()
             except:
-                print("Cant get states... Thread Exiting")
+                print("Cant get states... Thread "+str(id)+" Exiting")
                 return 0
             
 
