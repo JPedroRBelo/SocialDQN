@@ -278,8 +278,7 @@ def main(cfg):
                             threads_agents[i] = None
                     elif(thread_alive_time > max_thread_time):
                         #print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
-                        debug= True
-                        ep_debug = threads_at_ep
+                        env[i].setDebut( threads_at_ep)
                         #threads_agents[i].daemon()
                         '''
                         print("Reseting")
@@ -352,24 +351,22 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         #env.reset()
 
         # Capture the current state
-        if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+        
         gray_state,depth_state = env.get_screen()
-        if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+        
         # Reset score collector
         score = 0
         done = False
         # One episode loop
         step = 0
         while not done:
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
             # Action selection by Epsilon-Greedy policy
             action = agent.eGreedy(gray_state,epsilon)
-            #action = agent.select_action(gray_state,depth_state)
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
-            reward, done = env.execute(action)
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            #action = agent.select_action(gray_state,depth_state)            
+            reward, done = env.execute(action)            
             next_gray_state,next_depth_state = env.get_screen()
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
 
             if(save_images):
                 if(next_gray_state!=None):
@@ -381,14 +378,14 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
 
             # Store experience
             memory.push(gray_state, action, reward, next_gray_state, done)
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
             ep_actions_rewards.append([action,reward])
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
             if(save_social_states):
                 ep_social_state.append(gray_state[1])
             # Update Q-Learning
             step += 1
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
             if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start:
                 # Recall experiences (miniBatch)
                 experiences = memory.recall()
@@ -397,20 +394,20 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
                 #print('\r#Training step:{}'.format(step), end="")
 
             # State transition
-            if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+            
             gray_state = next_gray_state
             depth_state = next_depth_state
 
             # Update total score
             score += reward
-        if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+        
 
         actions_rewards[i_episode] =  ep_actions_rewards
         if(save_social_states):
             social_signals[i_episode] =  ep_social_state
         scores_window.append(score)
         scores[i_episode] = [score, np.mean(scores_window), np.std(scores_window)]
-        if(debug and ep_debug==i_episode): print("Line: "+str(getframeinfo(currentframe()).lineno))
+        
         # Print episode summary
         print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon), end="")
         #if i_episode % 100 == 0:
