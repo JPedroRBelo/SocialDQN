@@ -254,17 +254,21 @@ def main(cfg):
                     thread_log += ' #THREAD {}: {}'.format(i, alive)
                     thread_alive_time = (time.time() - threads_times[i])
                     if(not threads_agents[i].is_alive()):
-                        ep_count+=1
-                        epsilon = max(epsilon_floor, epsilon*epsilon_decay)
-                        plot(scores,agent.name,params,ep_count,save=False)
+                        if(actions_rewards[threads_at_ep[i]]!=None):
+                            ep_count+=1
+                            epsilon = max(epsilon_floor, epsilon*epsilon_decay)
+                            plot(scores,agent.name,params,ep_count,save=False)
 
 
-                        if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
-                            # Recall experiences (miniBatch)
-                            experiences = memory.recall()
-                            # Train agent
-                            agent.learn(experiences)
-                            print('\r#Training step:{}'.format(ep_count), end="")
+                            if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
+                                # Recall experiences (miniBatch)
+                                experiences = memory.recall()
+                                # Train agent
+                                agent.learn(experiences)
+                                print('\r#Training step:{}'.format(ep_count), end="")
+
+                        else: 
+                            queue_episodes.appendleft(threads_at_ep[i])
 
                         if(len(queue_episodes)>0):
                             ep_at = queue_episodes.popleft()
@@ -276,6 +280,8 @@ def main(cfg):
                             threads_at_ep[i] = ep_at
                         else:
                             threads_agents[i] = None
+                    
+
                     elif(thread_alive_time > max_thread_time):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
@@ -352,9 +358,12 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         env.episode = i_episode
 
         # Capture the current state
-        
-        gray_state,depth_state = env.get_screen()
-        
+        try:
+            gray_state,depth_state = env.get_screen()
+        except:
+            print("Cant get states... Thread Exiting")
+            return 0
+            
         # Reset score collector
         score = 0
         done = False
@@ -365,8 +374,12 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
             # Action selection by Epsilon-Greedy policy
             action = agent.eGreedy(gray_state,epsilon)
             #action = agent.select_action(gray_state,depth_state)            
-            reward, done = env.execute(action)            
-            next_gray_state,next_depth_state = env.get_screen()
+            reward, done = env.execute(action)   
+            try:         
+                next_gray_state,next_depth_state = env.get_screen()
+            except:
+                print("Cant get states... Thread Exiting")
+                return 0
             
 
             if(save_images):
