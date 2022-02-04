@@ -275,15 +275,21 @@ def main(cfg):
                     elif(thread_alive_time > max_thread_time):
                         print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"...")
                         #threads_agents[i].daemon()
+                        print("Reseting")
                         envs[i].reset()
-                        time.sleep(1)
+                        print("New thread")
+
+                        #time.sleep(1)
                         #envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
+                        print("Seting daemon...")
                         threads_agents[i].setDaemon(True)  
+                        print("Starting new thread")
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
+                        print("New Thread running")
 
 
 
