@@ -193,11 +193,13 @@ class Environment:
 			print('{} Simulator: {}'.format(text,data))
 		done = False;
 		while not done:
-			print("sending config data")
-			self.socket.send(data.encode())
+			try: 
+				self.socket.send(data.encode())
+			except Exception:
+				print("Connection Exception")
+				return 0
 			time_start = time.time();
 			time_now = time.time();
-			print("Data sended...")
 			while (time_now - time_start)<1:
 				msg = self.socket.recv(1024)
 				time_now = time.time();
@@ -213,6 +215,35 @@ class Environment:
 				break
 
 
+		return 0
+
+	def reseting_simulation(self):
+
+		data = "reset"
+		done = False;
+		while not done:
+			print("sending config data")
+			try: 
+				self.socket.send(data.encode())
+			except Exception:
+				print("Connection Exception")
+				return -1
+			time_start = time.time();
+			time_now = time.time();
+			print("Data sended...")
+			while (time_now - time_start)<1:
+				msg = self.socket.recv(1024)
+				time_now = time.time();
+				try:
+					msg = msg.decode()
+					if msg:
+						return 1
+
+				except Exception:
+					print("Config simulator Exception")
+					continue
+
+				done = True
 		return 0
 
 	def is_final_state(self,action,reward):
@@ -371,13 +402,17 @@ class Environment:
 		return recv	
 
 	def reset(self):
-		self.config_simulation("reset","Reseting")
-		time.sleep(10)
-
-		self.close()
-		self.connect()
-		self.step = 0
-		self.set_configuration()
+		result = self.reseting_simulation()
+		if(result==-1):
+			print("Can't connect with simulator")
+			return 0
+		else:
+			time.sleep(3)
+			self.close()
+			self.connect()
+			self.step = 0
+			self.set_configuration()
+			return 1
 	
 	def close_connection(self):
 		self.close_simulator()	

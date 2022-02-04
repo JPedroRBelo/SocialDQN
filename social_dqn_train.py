@@ -276,7 +276,11 @@ def main(cfg):
                         print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"...")
                         #threads_agents[i].daemon()
                         print("Reseting")
-                        envs[i].reset()
+                        result = envs[i].reset()
+                        if(result==0):
+                            time.sleep(1)
+                            envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
+
                         print("New thread")
 
                         #time.sleep(1)
