@@ -192,6 +192,7 @@ class Environment:
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while True:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+			self.socket.settimeout(5.0)
 			reward = self.socket.recv(1024).decode()
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if reward:
@@ -348,7 +349,8 @@ class Environment:
 			self.socket.send('next_size'.encode())
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			while True:	
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))						
+				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+				self.socket.settimeout(5.0)						
 				recv = self.socket.recv(6)
 				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				recv = recv.decode().rstrip("\n")
@@ -395,6 +397,7 @@ class Environment:
 				while True:
 					try:
 						if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+						self.socket.settimeout(5.0)
 						msg = self.socket.recv(1024).decode()
 						if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 						if msg:				
@@ -446,7 +449,8 @@ class Environment:
 	def receive_image(self,size):
 		read = 0
 		while True:			
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))	
+			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+			self.socket.settimeout(5.0)	
 			recv = self.socket.recv(size)
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			read += len(recv)
