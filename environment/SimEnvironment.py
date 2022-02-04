@@ -308,7 +308,9 @@ class Environment:
 						terminal = True
 						reward = self.ep_fail_reward
 					self.step += 1
-					return reward,terminal				
+					print("Reward: "+str(reward))
+					return reward,terminal		
+		print("Reward errado")		
 		return 0
 
 	'''
