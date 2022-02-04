@@ -276,7 +276,7 @@ def main(cfg):
                                 time.sleep(2)
                         if(len(queue_episodes)>0):
                             ep_at = queue_episodes.popleft()
-                            threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,id=i))
+                            threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,i))
                             #threads.append(t)
                             threads_agents[i].setDaemon(True)  
                             threads_agents[i].start()
@@ -302,7 +302,7 @@ def main(cfg):
                         #time.sleep(1)
                         #envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
-                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,id=i))
+                        threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,i))
                         print("Seting daemon...")
                         threads_agents[i].setDaemon(True)  
                         print("Starting new thread")
