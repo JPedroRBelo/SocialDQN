@@ -18,6 +18,7 @@ import signal
 from os.path import abspath, dirname, join
 from utils.SocialSigns import SocialSigns
 import pandas as pd
+import select
 
 
 
@@ -65,10 +66,7 @@ class Environment:
 			name = params['env_name']
 			folder = name
 			if(not simulator_path==''):
-				folder = simulator_path
-
-				
-			
+				folder = simulator_path			
 			
 			command = './'+name+'.x86_64'			
 			command = abspath(join(folder,command))
@@ -106,7 +104,13 @@ class Environment:
 		self.config_simulation("use_depth"+str(self.use_depth_state))
 
 	def connect(self):
-		self.socket,self.client = self.__connect()	
+		self.socket,self.client = self.__connect()
+		timeout = 1
+		ready_sockets, _, _ = select.select([self.socket], [], [], timeout)
+		if ready_sockets:
+			data = self.socket.recv(1024)
+			print("Junk: "+str(data))
+
 
 	def get_tensor_from_file(self,file):
 		convert = T.Compose([T.ToPILImage(),
@@ -347,6 +351,7 @@ class Environment:
 	def reset(self):
 		self.config_simulation("reset","Reseting")
 		time.sleep(5)
+
 		self.close()
 		self.connect()
 		self.step = 0

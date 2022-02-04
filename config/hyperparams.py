@@ -4,11 +4,11 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     1,
-        'number_of_agents':     15,
+        'simulation_speed':     10,
+        'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
-        't_steps':              25,
+        't_steps':              10,
         'screen_width':         320,
         'screen_height':        240,
         'frame_height':         320,
@@ -47,7 +47,7 @@ PARAMETERS = {
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
-        'update_interval':      1,                  # network updating every update_interval steps
+        'update_interval':      5,                  # network updating every update_interval steps
         'fix_target_updates':   1,                 # fix the target Q for the fix_target_updates
         'train_after_episodes': True,
 
