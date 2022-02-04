@@ -280,7 +280,7 @@ def main(cfg):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
                         #threads_agents[i].daemon()
-                        '''
+                        
                         print("Reseting")
                         result = envs[i].reset()
                         if(result==0):
@@ -300,7 +300,7 @@ def main(cfg):
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
                         print("New Thread running")
-                        '''
+                        
 
 
 
