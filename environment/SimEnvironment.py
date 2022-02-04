@@ -415,7 +415,7 @@ class Environment:
 			self.close()
 			self.connect()
 			self.step = 0
-			self.s()
+			self.set_configuration()
 			return 1
 	
 	def close_connection(self):
