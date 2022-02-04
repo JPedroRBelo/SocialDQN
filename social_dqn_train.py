@@ -277,7 +277,9 @@ def main(cfg):
                         else:
                             threads_agents[i] = None
                     elif(thread_alive_time > max_thread_time):
-                        print("#THREAD "+str(i)+" taking too long... reseting ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
+                        print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
+                        debug= True
+                        ep_debug = threads_at_ep
                         #threads_agents[i].daemon()
                         '''
                         print("Reseting")
