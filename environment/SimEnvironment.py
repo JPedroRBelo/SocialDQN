@@ -179,7 +179,11 @@ class Environment:
 		while True:
 			reward = self.socket.recv(1024).decode()
 			if reward:
-				return float(reward.replace(',','.'))
+				try:
+				    reward_value = float(reward.replace(',','.'))
+				    return reward_value
+				except (ValueError, TypeError):
+				   continue				
 			break
 		return 0
 
