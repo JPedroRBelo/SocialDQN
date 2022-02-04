@@ -5,7 +5,7 @@ PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
         'simulation_speed':     10,
-        'number_of_agents':     15,
+        'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
         't_steps':              10,
