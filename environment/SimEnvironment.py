@@ -311,7 +311,7 @@ class Environment:
 						break
 					except Exception:
 						print("Socket Error")
-						return None,None
+						continue
 				'''
 				if(face in self.emotional_states):
 					face_count.append(face)
