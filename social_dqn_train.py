@@ -253,12 +253,14 @@ def main(cfg):
         while ep_count<episodes:
 
             thread_log = ""
+            time_init = time.time()
             for i in range(len(threads_agents)):
                 #envs[i].setDebug(threads_at_ep[i])
                 if(threads_agents[i]!=None):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
-                    thread_log += ' #THREAD {}: {}'.format(i, alive)
+                    #thread_log += ' #THREAD {}: {}'.format(i, alive)
                     thread_alive_time = (time.time() - threads_times[i])
+                    thread_log += ' #THREAD {}: {} Time: {}'.format(i, alive,thread_alive_time)
                     if(not threads_agents[i].is_alive()):
                         if(actions_rewards[threads_at_ep[i]]!=None):
                             ep_count+=1
@@ -330,6 +332,10 @@ def main(cfg):
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
+                time_now = time.time() - time_init
+                if(time_now%20):
+                    print(thread_log)
+
             if(ep_count % params['save_interval'] == 0 ):
                 # Export scores to csv file
                 df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
