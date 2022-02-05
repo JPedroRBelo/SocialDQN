@@ -312,7 +312,7 @@ def main(cfg):
                             print(("New env"))
                             envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
                             print("New env created")
-
+                        print("Reseted")
 
 
                         #time.sleep(1)
@@ -405,8 +405,13 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
             
             # Action selection by Epsilon-Greedy policy
             action = agent.eGreedy(gray_state,epsilon)
-            #action = agent.select_action(gray_state,depth_state)            
-            reward, done = env.execute(action)   
+            #action = agent.select_action(gray_state,depth_state)    
+            try:         
+                reward, done = env.execute(action)   
+            except:
+                print("Cant get reward... Thread "+str(id)+" Exiting")
+                return 0        
+
             try:         
                 next_gray_state,next_depth_state = env.get_screen()
             except:

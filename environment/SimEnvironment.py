@@ -293,6 +293,7 @@ class Environment:
 		
 		while True:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+			self.socket.settimeout(self.socket_time_out)
 			data = self.socket.recv(1024).decode()
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if data:
@@ -309,8 +310,7 @@ class Environment:
 					self.step += 1
 					#print("Reward: "+str(original_data)+ "converted "+str(reward))
 					return reward,terminal	
-			else:
-				print("Not ")	
+	
 	
 		return 0
 
