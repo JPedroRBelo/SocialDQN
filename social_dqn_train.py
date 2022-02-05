@@ -301,12 +301,17 @@ def main(cfg):
         
                         try:
                             result = envs[i].reset()
+                            print("Reseting")
                         except Exception:
+                            print("Exception")
                             result = 0
                             envs[i].close_connection()
+                            print("Closed")
                         if(result==0):
                             time.sleep(1)
+                            print(("New env"))
                             envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
+                            print("New env created")
 
 
 
@@ -333,8 +338,8 @@ def main(cfg):
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
                 time_now = time.time() - time_init
-                if(int(time_now)%20==0):
-                    print(thread_log)
+                #if(int(time_now)%20==0):
+                #   print(thread_log)
 
             if(ep_count % params['save_interval'] == 0 ):
                 # Export scores to csv file
