@@ -294,27 +294,19 @@ def main(cfg):
                             threads_agents[i] = None
                     
 
-                    elif(thread_alive_time > 30):
+                    elif(thread_alive_time > self.max_thread_time):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
                         #threads_agents[i].daemon()
                         #envs[i].setDebug(threads_at_ep[i])
-                        try:
-                            print("Trying reset")
+                        try:                            
                             result = envs[i].reset()
-                            print("Reseting")
                         except Exception:
-                            print("Exception")
                             result = 0
                             envs[i].close_connection()
-                            print("Closed")
                         if(result==0):
                             time.sleep(1)
-                            print(("New env"))
                             envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
-                            print("New env created")
-                        print("Reseted")
-
 
                         #time.sleep(1)
                         #envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
@@ -461,7 +453,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         scores[i_episode] = [score, np.mean(scores_window), np.std(scores_window)]
         
         # Print episode summary
-        print('\n#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))#, end="")
+        print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon), end="")
         #if i_episode % 100 == 0:
             #print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
