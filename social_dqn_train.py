@@ -298,7 +298,7 @@ def main(cfg):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
                         #threads_agents[i].daemon()
-                        envs[i].setDebug(threads_at_ep[i])
+                        #envs[i].setDebug(threads_at_ep[i])
                         try:
                             print("Trying reset")
                             result = envs[i].reset()
