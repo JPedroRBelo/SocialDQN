@@ -8,7 +8,7 @@ PARAMETERS = {
         'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
-        't_steps':              15,
+        't_steps':              25,
         'screen_width':         320,
         'screen_height':        240,
         'frame_height':         320,
@@ -23,7 +23,7 @@ PARAMETERS = {
         'stop_scores':          1.0,
         'scores_window_size':   100,
         'train_episodes':       15000,
-        'save_images':          False,
+        'save_images':          True,
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
@@ -48,7 +48,7 @@ PARAMETERS = {
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
-        'update_interval':      5,                  # network updating every update_interval steps
+        'update_interval':      1,                  # network updating every update_interval steps
         'fix_target_updates':   1,                 # fix the target Q for the fix_target_updates
         'train_after_episodes': True,
 
@@ -64,7 +64,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           64,                  # minibatch size
+        'batch_size':           128,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
@@ -77,7 +77,7 @@ PARAMETERS = {
         'hs_fail_reward':       -0.2,
         'eg_success_reward':    0,
         'eg_fail_reward':       -0.1,
-        'ep_fail_reward':       0
+        'ep_fail_reward':       -1
     },
 }
 # -------------------------------------------------------------------- #
