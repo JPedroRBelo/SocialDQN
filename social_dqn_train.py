@@ -379,7 +379,18 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         ep_actions_rewards = []
         ep_social_state = []
         # Reset the environment
-        env.reset(restart_simulator=False)
+        #env.reset(restart_simulator=False)
+        try:                            
+            result = env.reset()
+        except Exception:
+            result = 0
+            env.close_connection()
+        if(result==0):
+            time.sleep(1)
+            envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
+
+
+
         env.episode = i_episode
 
         # Capture the current state
