@@ -460,7 +460,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         scores[i_episode] = [score, np.mean(scores_window), np.std(scores_window)]
         
         # Print episode summary
-        print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon), end="")
+        print('\n#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))#, end="")
         #if i_episode % 100 == 0:
             #print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
