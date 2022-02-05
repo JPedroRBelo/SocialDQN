@@ -296,8 +296,7 @@ def main(cfg):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
                         #threads_agents[i].daemon()
-                        
-                        print("Reseting")
+        
                         try:
                             result = envs[i].reset()
                         except Exception:
@@ -307,19 +306,16 @@ def main(cfg):
                             time.sleep(1)
                             envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
-                        print("New thread")
+
 
                         #time.sleep(1)
                         #envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
 
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,threads_at_ep[i],memory,params,epsilon,scores,scores_window,actions_rewards,social_signals,i))
-                        print("Seting daemon...")
                         threads_agents[i].setDaemon(True)  
-                        print("Starting new thread")
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
-                        print("New Thread running")
                         
 
 

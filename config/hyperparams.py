@@ -29,6 +29,8 @@ PARAMETERS = {
         'stop_when_solved':     False,
         'save_interval':        1000,
 
+        'socket_time_out':      20.0,
+
         #Multimodal DQN: get detph states
         'use_depth_state':      False,
         'use_only_depth_state': False,

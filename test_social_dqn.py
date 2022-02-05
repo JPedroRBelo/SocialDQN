@@ -375,9 +375,13 @@ def just_run(steps=30,restart_done=True):
 
 
 def customized_params(params):
+    params['screen_width'] = 320
+    params['screen_height'] = 240
     params['simulation_speed'] = 1
     params['save_social_states'] = True
     params['save_images'] = True
+    params['socket_time_out'] =20.0
+
     return params 
 
 
