@@ -249,11 +249,11 @@ def main(cfg):
         
         envs_fails = [0] * number_of_agents
 
-
+        time_init = time.time()
         while ep_count<episodes:
 
             thread_log = ""
-            time_init = time.time()
+            
             for i in range(len(threads_agents)):
                 #envs[i].setDebug(threads_at_ep[i])
                 if(threads_agents[i]!=None):
