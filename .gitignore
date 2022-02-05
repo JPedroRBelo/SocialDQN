@@ -6,6 +6,7 @@ dqn/scores/*
 SimDRLSR/*
 simDRLSR/*
 environment/simDRLSR/*
+images/*
 
 
 #scores/
