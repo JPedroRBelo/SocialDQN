@@ -260,7 +260,7 @@ def main(cfg):
                     alive = "Running" if threads_agents[i].is_alive() else "Dead"
                     #thread_log += ' #THREAD {}: {}'.format(i, alive)
                     thread_alive_time = (time.time() - threads_times[i])
-                    thread_log += ' #THREAD {}: {} Time: {}'.format(i, alive,thread_alive_time)
+                    thread_log += ' #\nTHREAD {}: {} Time: {}'.format(i, alive,thread_alive_time)
                     if(not threads_agents[i].is_alive()):
                         if(actions_rewards[threads_at_ep[i]]!=None):
                             ep_count+=1
@@ -323,7 +323,7 @@ def main(cfg):
 
 
                 else:
-                    thread_log += ' #THREAD{}: NONE'.format(i)
+                    thread_log += '\n #THREAD{}: NONE'.format(i)
                     if(len(queue_episodes)>0):
                         ep_at = queue_episodes.popleft()
                         threads_agents[i] = Thread(target=execute_ep, args=(envs[i],agent,ep_at,memory,params,epsilon,scores,scores_window,actions_rewards,social_signals))
@@ -333,7 +333,7 @@ def main(cfg):
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
                 time_now = time.time() - time_init
-                if(time_now%20):
+                if(int(time_now)%20==0):
                     print(thread_log)
 
             if(ep_count % params['save_interval'] == 0 ):
