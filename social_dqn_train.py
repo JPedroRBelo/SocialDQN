@@ -40,14 +40,20 @@ def dir_path(path):
         raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
 
 
-def save_action_reward_history(actions_rewards):
+def save_action_reward_history(actions_rewards,ep=0):
+    filename_ep = str(ep)
+    if(ep==0):
+        filename_ep=''
     dirr = 'scores/'
-    file = 'action_reward_history.dat'
+    file = 'action_reward_history'+filename_ep+'.dat'
     torch.save(actions_rewards,dirr+file)
 
-def save_social_signals_states(social_signals):
+def save_social_signals_states(social_signals,ep=0):
+    filename_ep = str(ep)
+    if(ep==0):
+        filename_ep=''
     dirr = 'scores/'
-    file = 'social_signals_history.dat'
+    file = 'social_signals_history'+filename_ep+'.dat'
     torch.save(social_signals,dirr+file)
 
 
@@ -324,7 +330,18 @@ def main(cfg):
                         threads_agents[i].start()
                         threads_times[i] = time.time()
                         threads_at_ep[i] = ep_at
-            #print(("\r"+thread_log),end="")
+            if(ep_count % params['save_interval'] == 0 ):
+                # Export scores to csv file
+                df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
+                df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
+                save_action_reward_history(actions_rewards,ep_count)
+                save_social_states = params['save_social_states']
+                if(save_social_states):
+                    save_social_signals_states(social_signals,ep_count)
+                agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(ep_count)))
+                if(ep_count):
+                    plot(scores,agent.name,params,ep_count,save=True)
+
 
         for env in envs:  
             env.close_connection()

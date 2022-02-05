@@ -4,8 +4,8 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     15,
-        'number_of_agents':     8,
+        'simulation_speed':     20,
+        'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
         't_steps':              10,
@@ -27,6 +27,7 @@ PARAMETERS = {
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
+        'save_interval':        50,
 
         #Multimodal DQN: get detph states
         'use_depth_state':      False,
