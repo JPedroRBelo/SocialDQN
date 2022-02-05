@@ -298,7 +298,11 @@ def main(cfg):
                         #threads_agents[i].daemon()
                         
                         print("Reseting")
-                        result = envs[i].reset()
+                        try:
+                            result = envs[i].reset()
+                        except Exception:
+                            result = 0
+                            envs[i].close_connection()
                         if(result==0):
                             time.sleep(1)
                             envs[i] = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i)
