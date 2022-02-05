@@ -401,17 +401,15 @@ class Environment:
 				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				face = 'no_face'
 				while True:
-					try:
-						if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-						self.socket.settimeout(5.0)
-						msg = self.socket.recv(1024).decode()
-						if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-						if msg:				
-							face = msg.replace('\n','')
-						break
-					except Exception:
-						print("Socket Error")
-						continue
+					
+					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+					self.socket.settimeout(5.0)
+					msg = self.socket.recv(1024).decode()
+					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+					if msg:				
+						face = msg.replace('\n','')
+					break
+
 				'''
 				if(face in self.emotional_states):
 					face_count.append(face)
