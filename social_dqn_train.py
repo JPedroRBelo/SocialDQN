@@ -294,7 +294,7 @@ def main(cfg):
                             threads_agents[i] = None
                     
 
-                    elif(thread_alive_time > self.max_thread_time):
+                    elif(thread_alive_time > max_thread_time):
                         print("#THREAD "+str(i)+" taking too long... ep"+str(threads_at_ep[i])+"... "+str(thread_alive_time)+" seconds alive.")
                         
                         #threads_agents[i].daemon()
