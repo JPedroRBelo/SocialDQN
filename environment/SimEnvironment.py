@@ -259,9 +259,11 @@ class Environment:
 			except Exception:
 				print("Connection Exception")
 				return -1
+			print("Data Sended")
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 			while True:
+				print("receinving")
 				self.socket.settimeout(self.socket_time_out)		
 				msg = self.socket.recv(1024)
 				try:
