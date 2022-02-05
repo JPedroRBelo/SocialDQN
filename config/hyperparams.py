@@ -4,11 +4,11 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     20,
+        'simulation_speed':     2,
         'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
-        't_steps':              10,
+        't_steps':              15,
         'screen_width':         320,
         'screen_height':        240,
         'frame_height':         320,
@@ -22,12 +22,12 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       100,
+        'train_episodes':       15000,
         'save_images':          False,
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
-        'save_interval':        50,
+        'save_interval':        1000,
 
         #Multimodal DQN: get detph states
         'use_depth_state':      False,
