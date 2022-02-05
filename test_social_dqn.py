@@ -177,7 +177,7 @@ def validate_eps(eps=1):
         ep_actions_rewards = []
         ep_social_state = []
         # Reset the environment
-        env.reset()
+        env.reset(restart_simulator=False)
 
         # Capture the current state
         gray_state,_ = env.get_screen()
@@ -316,7 +316,7 @@ def just_run(steps=30,restart_done=True):
     ep_social_state = []
 
     done = False
-    env.reset()
+    env.reset(restart_simulator=False)
 
     # Capture the current state
     gray_state,_ = env.get_screen()
@@ -354,7 +354,7 @@ def just_run(steps=30,restart_done=True):
         score += reward
         if(done):
             done = False
-            env.reset()
+            env.reset(restart_simulator=False)
             # Capture the current state
             gray_state,_ = env.get_screen()
 
@@ -375,8 +375,8 @@ def just_run(steps=30,restart_done=True):
 
 
 def customized_params(params):
-    params['screen_width'] = 320
-    params['screen_height'] = 240
+    params['screen_width'] = 1080
+    params['screen_height'] = 768
     params['simulation_speed'] = 1
     params['save_social_states'] = True
     params['save_images'] = True
