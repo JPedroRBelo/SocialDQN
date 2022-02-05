@@ -267,10 +267,10 @@ class Environment:
 				self.socket.settimeout(self.socket_time_out)		
 				msg = self.socket.recv(1024)			
 				msg = msg.decode()
-				if msg:
-					return 1
-
 				done = True
+				return 1
+
+
 		return 0
 
 	def is_final_state(self,action,reward):
