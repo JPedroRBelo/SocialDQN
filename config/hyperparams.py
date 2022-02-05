@@ -23,7 +23,7 @@ PARAMETERS = {
         'stop_scores':          1.0,
         'scores_window_size':   100,
         'train_episodes':       15000,
-        'save_images':          True,
+        'save_images':          False,
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
