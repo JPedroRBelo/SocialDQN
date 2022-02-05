@@ -55,6 +55,7 @@ class Environment:
 		
 		self.params = params
 		self.step = 0
+		self.socket_time_out = params['socket_time_out']
 		self.SocialSigns = SocialSigns()
 		self.port = self.params['port']
 		if(port!=0):
@@ -115,7 +116,7 @@ class Environment:
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.socket,self.client = self.__connect()
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-		timeout = 1
+		timeout = 5
 		ready_sockets, _, _ = select.select([self.socket], [], [], timeout)
 		if ready_sockets:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
@@ -192,7 +193,7 @@ class Environment:
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while True:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-			self.socket.settimeout(5.0)
+			self.socket.settimeout(self.socket_time_out )
 			reward = self.socket.recv(1024).decode()
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if reward:
@@ -253,17 +254,15 @@ class Environment:
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while not done:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-			print("sending config data")
 			try: 
 				self.socket.send(data.encode())
 			except Exception:
 				print("Connection Exception")
 				return -1
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-			print("Data sended...")
-			while (time_now - time_start)<1:
-				print('waiting data')
-				self.socket.settimeout(5.0)		
+
+			while True:
+				self.socket.settimeout(self.socket_time_out)		
 				msg = self.socket.recv(1024)
 				try:
 					msg = msg.decode()
@@ -356,7 +355,7 @@ class Environment:
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			while True:	
 				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-				self.socket.settimeout(5.0)						
+				self.socket.settimeout(self.socket_time_out)						
 				recv = self.socket.recv(6)
 				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				recv = recv.decode().rstrip("\n")
@@ -403,7 +402,7 @@ class Environment:
 				while True:
 					
 					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-					self.socket.settimeout(5.0)
+					self.socket.settimeout(self.socket_time_out)
 					msg = self.socket.recv(1024).decode()
 					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					if msg:				
@@ -454,7 +453,7 @@ class Environment:
 		read = 0
 		while True:			
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-			self.socket.settimeout(5.0)	
+			self.socket.settimeout(self.socket_time_out)	
 			recv = self.socket.recv(size)
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			read += len(recv)
@@ -474,7 +473,6 @@ class Environment:
 				self.reseting_simulation()
 			else:
 				time.sleep(3)
-				print("Reseted!")
 				self.close()
 				self.connect()				
 				self.set_configuration()
