@@ -265,15 +265,10 @@ class Environment:
 			while True:
 				print("receinving")
 				self.socket.settimeout(self.socket_time_out)		
-				msg = self.socket.recv(1024)
-				try:
-					msg = msg.decode()
-					if msg:
-						return 1
-
-				except Exception:
-					print("Config simulator Exception")
-					continue
+				msg = self.socket.recv(1024)			
+				msg = msg.decode()
+				if msg:
+					return 1
 
 				done = True
 		return 0
