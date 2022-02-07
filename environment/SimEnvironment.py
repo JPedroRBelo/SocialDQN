@@ -224,23 +224,15 @@ class Environment:
 				print("Connection Exception")
 				return 0
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-			time_start = time.time();
-			time_now = time.time();
-			while (time_now - time_start)<1:
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-				msg = self.socket.recv(1024)
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-				time_now = time.time();
-				try:
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-					msg = msg.decode()
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
-					if msg:
-						return float(msg.replace(',','.').replace('\n',''))
 
-				except Exception:
-					print("Config simulator Exception")
-					continue
+			while (True):
+				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+				self.socket.settimeout(self.socket_time_out)
+				msg = self.socket.recv(1024)
+				msg = msg.decode()
+				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+				if msg:
+					return float(msg.replace(',','.').replace('\n',''))
 
 				break
 
@@ -331,6 +323,7 @@ class Environment:
 		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while True:		
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
+			self.socket.settimeout(self.socket_time_out)
 			recv = self.socket.recv(1024)
 			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if(recv):
