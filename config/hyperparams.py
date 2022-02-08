@@ -4,7 +4,7 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     2,
+        'simulation_speed':     1,
         'number_of_agents':     10,
         'action_size':          4,
         'state_size':           8,
@@ -66,7 +66,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           128,                  # minibatch size
+        'batch_size':           64,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
