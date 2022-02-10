@@ -177,7 +177,7 @@ def validate_eps(eps=1):
         ep_actions_rewards = []
         ep_social_state = []
         # Reset the environment
-        env.reset(restart_simulator=False)
+        env.reset(restart_simulator=True)
 
         # Capture the current state
         gray_state,_ = env.get_screen()
@@ -316,7 +316,7 @@ def just_run(steps=30,restart_done=True):
     ep_social_state = []
 
     done = False
-    env.reset(restart_simulator=False)
+    env.reset(restart_simulator=True)
 
     # Capture the current state
     gray_state,_ = env.get_screen()
@@ -354,7 +354,7 @@ def just_run(steps=30,restart_done=True):
         score += reward
         if(done):
             done = False
-            env.reset(restart_simulator=False)
+            env.reset(restart_simulator=True)
             # Capture the current state
             gray_state,_ = env.get_screen()
 

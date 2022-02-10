@@ -159,7 +159,7 @@ def plot_culmulative(scores,name,params,i_episode,save=False,save_location=''):
 
 
 	ax = fig.add_subplot(111)
-	episode = np.arange(len(scores[0][0]))
+	#episode = np.arange(len(scores[0][0]))
 	
 	average_scores = []
 	count = 1
@@ -168,6 +168,7 @@ def plot_culmulative(scores,name,params,i_episode,save=False,save_location=''):
 	for scr,legend in scores:
 		df = pandas.DataFrame(scr,columns=['scores','average_scores','std'])
 		maxlen = min(maxlen,len(df['scores']))
+	episode = np.arange(maxlen)
 	for scr,legend in scores:
 		df = pandas.DataFrame(scr,columns=['scores','average_scores','std'])
 		plt.plot(episode,df['average_scores'][:maxlen])
@@ -470,9 +471,6 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 
-
-
-
 def calc_with_emotions(folders,labels):
 	print('\rLoading...', end="")
 	params = PARAMETERS['SimDRLSR']
@@ -768,9 +766,6 @@ def main(save=False):
 
 	labels.append("Only face state (no emotions). Sim with emotions 2")
 	folders.append('results/20220122_150759')
-
-
-
 	
 	
 
@@ -870,19 +865,24 @@ def main2(save=True):
 	folders = []
 	labels = []
 	
-
+	#20220208_040251
 	labels.append("1")
 	#75k rb
-	folders.append('results/20220108_182042')
+	#folders.append('results/20220108_182042')
+	folders.append('results/20220208_040251')
+	folders.append('results/20220208_040251')
+	folders.append('results/20220208_040251')
+
+
 
 	labels.append("2")
 	#75k rb
-	folders.append('results/20220108_182042')
+	#folders.append('results/20220108_182042')
 
 
 	labels.append("3")
 	#75k rb
-	folders.append('results/20220108_182042')
+	#folders.append('results/20220108_182042')
 
 	#labels.append("Only face state (no emotions). Sim with emotions")
 	#folders.append('results/20220115_101708')
@@ -975,25 +975,21 @@ def main2(save=True):
 				else:
 					print('\nIncorrect key...')
 
-if __name__ == "__main__":
-	main(save=True)
 
+def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 
+	scores = []
+	for fol,l in zip(folders,labels): 
+		files = os.path.join(fol,'scores')
+		folder_content = os.listdir(files)
+		filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
+		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
 
-
-
-
-
-
-
-
-
-
-
-'''
-
-
-def compare_actions(folders,labels,arg):
+	#scores1 = pd.read_csv(os.path.join(folders[i],'scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv'), sep=',') 
+	#scores2 = pd.read_csv('results/20211103_084843/scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv', sep=',') 
+	#scores3 = pd.read_csv('results/20211107_055205/scores/NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained_15000_episodes.csv', sep=',') 
 	params = PARAMETERS['SimDRLSR']
 	neutral_reward = params['neutral_reward']
 	hs_success_reward = params['hs_success_reward']
@@ -1001,98 +997,81 @@ def compare_actions(folders,labels,arg):
 	eg_success_reward = params['eg_success_reward']
 	eg_fail_reward = params['eg_fail_reward']
 	ep_fail_reward = params['ep_fail_reward']
-
-
-
-	results_rewards = []
 	average_scores = []
-	for fol,l in zip(folders,labels):
-		pth = os.path.join(fol,'scores/action_reward_history.dat')
-		rewards = torch.load(pth)
-		results_rewards.append(rewards)
-		v_hspos = []
-		v_hsneg = []
-		v_wvpos = []
-		v_wvneg = []
-		v_wave  = []
-		v_wait  = []
-		v_look  = []
-		ep_durations = []
-		scores = []  
-		scores_window = deque(maxlen=100)
-
-		for i in range(len(rewards)):			
-
-			hspos = 0
-			hsneg = 0
-			wave = 0
-			wvpos = 0
-			wvneg = 0
-			wait = 0
-			look = 0
-			for step in range(len(rewards[i])):		
-				if(len(rewards[i])>0 ):
-					action = rewards[i][step][0]
-					reward = rewards[i][step][1]
-
-					if action == 3 :
-						if reward ==  hs_success_reward:
-							hspos = hspos+1
-						elif reward == hs_fail_reward: 
-							hsneg = hsneg+1
-					
-					elif action == 0 :
-						wait = wait+1
-					elif action == 1 :
-						look = look+1
-					elif action == 2 :
-						
-						
-						wave = wave+1
-						if reward == eg_success_reward:
-							wvpos = wvpos+1
-						elif reward == eg_fail_reward:
-							wvneg = wvneg+1
-					else:
-						print(reward)
-			
-		
-			
-			
-			ep_durations.append(len(rewards[i]))
-			v_wait.append(wait)
-			v_look.append(look)
-			v_wave.append(wave)
-			v_wvneg.append(wvneg)
-			v_wvpos.append(wvpos)
-			v_hspos.append(hspos)
-			v_hsneg.append(hsneg)
+	#average_scores.append([calc_average_scores(scores1['scores'],maxlen=100),'Gray and Face States'])
+	#average_scores.append([calc_average_scores(scores2['scores'],maxlen=100),'Train after 4 Steps'])
+	#average_scores.append([calc_average_scores(scores3['scores'],maxlen=100),'Only Gray State'])
+	
+	#recalc_scores2 = calc_average_scores(scores['scores'],maxlen=500)
+	#box_plot(average_scores)
+	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 
-			plot_value = len(rewards[i])
-			#plot_value = 1	
-			if (arg == 'wv'):
-				plot_value = wave/plot_value
-			elif (arg == 'wv positive'):
-				plot_value = wvpos/plot_value
-			elif (arg == 'wv negative'):
-				plot_value = wvneg/plot_value
-			elif (arg == 'hs'):
-				plot_value = (hspos+hsneg)/plot_value
-			elif (arg == 'hs positive'):
-				plot_value = hspos/plot_value
-			elif (arg == 'hs negative'):
-				plot_value = hsneg/plot_value
-			elif (arg == 'wait'):
-				plot_value = wait/plot_value
-			elif (arg == 'look'):
-				plot_value = look/plot_value
+def extract_cumulative_rewards_by_emotion(folder,label):
+	emotion_pth = os.path.join(folder,'scores','social_signals_history.dat')
+	emotions = torch.load(emotion_pth)
+	files = os.path.join(folder,'scores')
+	folder_content = os.listdir(files)
+	filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+	candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+	score = pd.read_csv(os.path.join(folder,'scores',candidates[-1]), sep=',',nrows=MAX_EPS)
+	print(candidates[-1])
+	#scores.append([calc_average_scores(score['scores'],maxlen=250),label])
+	n_emotions = 3
+	dfs = []
+	for n in range(n_emotions):
+		dfs.append(pd.DataFrame(columns = score.columns))
+	
+	
+	for i in range(len(emotions)):
+		emotion_ep = 1
+		for step in range(len(emotions[i])):		
+			if(len(emotions[i])>0 ):
+				emotion = emotions[i][step].numpy()
+				n_emotion = convert_one_hot_to_number(emotion[0])
+				if(n_emotion>0):
+					emotion_ep = n_emotion
+					break;
+		row = score.iloc[i]
+		dfs[emotion_ep-1]=dfs[emotion_ep-1].append(row,ignore_index = True)
+	scores = []	
+	labels = ['Neutral Emotion','Positive Emotion','Negative Emotion']
+	for i in range(n_emotions):
+		scores.append([calc_average_scores(dfs[i]['scores'],maxlen=250),labels[i]])
+	return scores	
 
 
-			scores_window.append(plot_value)
-			scores.append([plot_value, np.mean(scores_window), np.std(scores_window)])
+def main3(save=True):
+	folders = []
+	labels = []
+	
+	#20220208_040251
+	labels.append("1")
+	#75k rb
+	#folders.append('results/20220108_182042')
+	folders.append('results/20220208_040251')
+	folders.append('results/20220208_040251')
+	folders.append('results/20220208_040251')
 
-		average_scores.append([calc_average_scores(scores,maxlen=100),l])
 
-	plot_rewards(average_scores,'result',params,100)
-'''
+
+	labels.append("2")
+	#75k rb
+	#folders.append('results/20220108_182042')
+
+
+	labels.append("3")
+	#75k rb
+	#folders.append('results/20220108_182042')
+
+	#labels.append("Only face state (no emotions). Sim with emotions")
+	#folders.append('results/20220115_101708')
+	params = PARAMETERS['SimDRLSR']
+	scores = extract_cumulative_rewards_by_emotion(folders[0],'')
+	params = PARAMETERS['SimDRLSR']
+	plot_culmulative(scores,'result',params,100,save=True,save_location='')
+	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location
+
+if __name__ == "__main__":
+	main3(save=True)
+
