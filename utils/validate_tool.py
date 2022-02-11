@@ -57,7 +57,7 @@ def plot(scores,params,i_episode,save=False,title='',metric='Score',save_locatio
 		plt.fill_between(episode,df['average_scores'][:maxlen].add(df['std'][:maxlen]),df['average_scores'][:maxlen].sub(df['std'][:maxlen]),alpha=0.3)
 		legends.append(legend)
 		count += 1
-	ax.legend(legends,loc='lower right')
+	ax.legend(legends,loc='upper right')
 		
 	#plt.fill_between(episode,df['average_scores'].add(df['std']),df['average_scores'].sub(df['std']),alpha=0.3)
 
@@ -69,7 +69,7 @@ def plot(scores,params,i_episode,save=False,title='',metric='Score',save_locatio
 	max_total_success = 1.5
 
    
-	major_ticks = np.arange(max_total_fails, max_total_success, 0.5)
+	major_ticks = np.arange(0, maxlen, 0.5)
 	minor_ticks = np.arange(max_total_fails, max_total_success, 0.1)
 
 	#ax.set_xticks(major_ticks)
@@ -85,8 +85,9 @@ def plot(scores,params,i_episode,save=False,title='',metric='Score',save_locatio
 	# Or if you want different settings for the grids:
 	ax.grid(which='minor', alpha=0.2)
 	ax.grid(which='major', alpha=0.5)
+	#ax.set_xticks(major_ticks, minor=False)
 	if(save):
-		fig.savefig(os.path.join(save_location,(title+'.png')))   # save the figure to file
+		fig.savefig(os.path.join(save_location,(title+'.png')))#, format="svg")   # save the figure to file
 	else:
 		plt.show() # pause a bit so that plots are updated
 
@@ -101,7 +102,7 @@ def plot_rewards(scores,name,params,i_episode,save=False):
 
 	plt.legend(loc='lower right')
 	ax = fig.add_subplot(111)
-	episode = np.arange(len(scores[0][0]))
+	episode = np.arange(len(scores[0][0])+1)
 	
 	average_scores = []
 	count = 1
@@ -160,7 +161,7 @@ def plot_culmulative(scores,name,params,i_episode,save=False,save_location=''):
 
 	ax = fig.add_subplot(111)
 	#episode = np.arange(len(scores[0][0]))
-	
+	plt.title('Cumulative Rewards')
 	average_scores = []
 	count = 1
 	legends = []
@@ -183,17 +184,22 @@ def plot_culmulative(scores,name,params,i_episode,save=False,save_location=''):
 	plt.ylabel('Score')
 	plt.xlabel('Episode')
 
+
 	max_total_fails = -3
 	max_total_success = 1.5
 
    
+	
 	major_ticks = np.arange(max_total_fails, max_total_success, 0.5)
 	minor_ticks = np.arange(max_total_fails, max_total_success, 0.1)
+	#plt.setp(ax.get_xticklabels(), rotation=15, horizontalalignment='right')
 
 	#ax.set_xticks(major_ticks)
 	#ax.set_xticks(minor_ticks, minor=True)
 	ax.set_yticks(major_ticks)
 	ax.set_yticks(minor_ticks, minor=True)
+	major_ticks = np.arange(0, maxlen+1, (maxlen/10))
+	ax.set_xticks(major_ticks, minor=False)
 	ax.axhline(1, color='gray', linewidth=0.5)
 	ax.axhline(0, color='gray', linewidth=0.5)
 	ax.axhline(-1, color='gray', linewidth=0.5)
@@ -446,7 +452,8 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 	for fol,l in zip(folders,labels): 
 		files = os.path.join(fol,'scores')
 		folder_content = os.listdir(files)
-		filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+		#filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+		filename = 'NeuralQLearner_simDRLSR_batch'
 		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
 		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
 		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
@@ -680,6 +687,10 @@ def calc_with_emotions(folders,labels):
 			#scores_window.append(plot_value)
 			#scores.append([plot_value, np.mean(scores_window), np.std(scores_window)])
 
+		labels2 = ['Neutral Emotion','Positive Emotion','Negative Emotion']
+		l = labels2[int(l)-1]
+
+
 		print('\rCalculating...', end="")
 		#average_scores.append([calc_average_scores(scores,maxlen=100),l])
 		wait_average_scores.append([calc_average_scores(wait_total_scores,maxlen=100),l])
@@ -756,16 +767,24 @@ def main(save=False):
 	#20220105_223402
 
 
-	labels.append("Only face state (no emotions). Sim with emotions")
-	folders.append('results/20220105_223402')
+	#labels.append("Only face state (no emotions). Sim with emotions")
+	#folders.append('results/20220105_223402')
 
 
 	#labels.append("Only face state (no emotions). Sim with emotions")
 	#folders.append('results/20220115_101708')
 
 
-	labels.append("Only face state (no emotions). Sim with emotions 2")
-	folders.append('results/20220122_150759')
+	#labels.append("Only face state (no emotions). Sim with emotions 2")
+	#folders.append('results/20220122_150759')
+
+	
+	
+	#labels.append("Simulator X1: 64 batch size")
+	labels.append("SocialDQN: Culmulative Rewards")
+	folders.append('results/20220209_201938')
+	#labels.append("Simulator X2: 128 batch size")
+	#folders.append('results/20220208_040251')
 	
 	
 
@@ -869,9 +888,9 @@ def main2(save=True):
 	labels.append("1")
 	#75k rb
 	#folders.append('results/20220108_182042')
-	folders.append('results/20220208_040251')
-	folders.append('results/20220208_040251')
-	folders.append('results/20220208_040251')
+	folders.append('results/20220209_201938')
+	folders.append('results/20220209_201938')
+	folders.append('results/20220209_201938')
 
 
 
@@ -898,9 +917,14 @@ def main2(save=True):
 				break
 			folder_index_name += 1 
 			directory = os.path.join('utils','validate_tool_results',str(folder_index_name))
-			
+		
+		scores = extract_cumulative_rewards_by_emotion(folders[0],'')
+		params = PARAMETERS['SimDRLSR']
+		#plot_culmulative(scores,'result',params,100,save=True,save_location=directory)		
 
-		compare_cumulative_rewards(folders,labels,save=True,save_location=directory)		
+		compare_cumulative_rewards(folders,labels,save=True,save_location=directory)	
+		plot_culmulative(scores,'result',params,100,save=True,save_location=directory)	
+		labels = ['Neutral Emotion','Positive Emotion','Negative Emotion']
 		plot(wave_average_scores,params,100,title='Wave',metric='Ratio (%)',save=True,save_location=directory)		
 		plot(wave_positive_average_scores,params,100,title='Wave with positive Reward',metric='Ratio (%)',save=True,save_location=directory)
 		plot(wave_negative_average_scores,params,100,title='Wave with negative Reward',metric='Ratio (%)',save=True,save_location=directory)
@@ -1040,6 +1064,99 @@ def extract_cumulative_rewards_by_emotion(folder,label):
 		scores.append([calc_average_scores(dfs[i]['scores'],maxlen=250),labels[i]])
 	return scores	
 
+def cumulative():
+	folders = []
+	labels = []
+	#labels.append('Gray and Face States (OpenCV)')
+	#Alternative
+	#labels.append('Train after each Epoch')
+	#folders.append('results/20211030_064156')
+
+	#labels.append('Train after 4 Steps')
+	#folders.append('results/20211103_084843')
+
+
+	#labels.append('Gray and Face States')
+
+
+
+
+	#labels.append("'Visible Face' States")
+	#folders.append('results/20211115_185645')
+
+	
+	#labels.append('Only Gray State')
+	#folders.append('results/20211107_055205')
+
+	
+	
+	
+
+	#labels.append('Only Face State')
+	#folders.append('results/20211120_223307')
+	
+	#labels.append('Depth and Face States')
+	#folders.append('results/20211126_054848')
+
+	#20211202_230251
+	#labels.append('Only Depth State')
+	#folders.append('results/20211202_230251')
+
+	'''
+	labels.append("Fail Reward: Negative - Emotions")
+	#75k rb
+	folders.append('results/20220103_083937')
+	'''
+	#50k rb 20211229_034231
+	#labels.append("Emotions 50k")
+	#folders.append('results/20211229_034231')
+
+	#labels.append("Fail Reward: Neutral - Emotions")
+	#75k rb
+
+	#folders.append('results/20220108_182042')
+	
+
+
+
+	#20220105_223402
+
+
+	#labels.append("Only face state (no emotions). Sim with emotions")
+	#folders.append('results/20220105_223402')
+
+
+	#labels.append("Only face state (no emotions). Sim with emotions")
+	#folders.append('results/20220115_101708')
+
+
+	#labels.append("Only face state (no emotions). Sim with emotions 2")
+	#folders.append('results/20220122_150759')
+
+	
+	
+	#labels.append("Simulator X1: 64 batch size")
+	labels.append("SocialDQN: Culmulative Rewards")
+	folders.append('results/20220209_201938')
+	#labels.append("Simulator X2: 128 batch size")
+	#folders.append('results/20220208_040251')
+	
+	
+
+	
+	params = PARAMETERS['SimDRLSR']
+
+	folder_index_name = 1
+	directory = os.path.join('utils','validate_tool_results',str(folder_index_name))
+	while(True):
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+			break
+		folder_index_name += 1 
+		directory = os.path.join('utils','validate_tool_results',str(folder_index_name))
+		
+
+	compare_cumulative_rewards(folders,labels,save=True,save_location=directory)	
 
 def main3(save=True):
 	folders = []
@@ -1049,9 +1166,9 @@ def main3(save=True):
 	labels.append("1")
 	#75k rb
 	#folders.append('results/20220108_182042')
-	folders.append('results/20220208_040251')
-	folders.append('results/20220208_040251')
-	folders.append('results/20220208_040251')
+	folders.append('results/20220209_201938')
+	folders.append('results/20220209_201938')
+	folders.append('results/20220209_201938')
 
 
 
@@ -1067,11 +1184,11 @@ def main3(save=True):
 	#labels.append("Only face state (no emotions). Sim with emotions")
 	#folders.append('results/20220115_101708')
 	params = PARAMETERS['SimDRLSR']
-	scores = extract_cumulative_rewards_by_emotion(folders[0],'')
-	params = PARAMETERS['SimDRLSR']
-	plot_culmulative(scores,'result',params,100,save=True,save_location='')
-	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location
+
+	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 if __name__ == "__main__":
-	main3(save=True)
+	#main(save=True)
+	main2()
+	#cumulative()
 

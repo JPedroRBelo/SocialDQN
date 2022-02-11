@@ -25,6 +25,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
     parser.add_argument('-s','--sim',default='')
     parser.add_argument('-m','--model',default='',type=dir_path)
+    parser.add_argument('-w','--write',default=False,type=bool)
+    parser.add_argument('-a','--alg',default='greedy')
     return parser.parse_args()
 
 def dir_path(path):
@@ -108,6 +110,7 @@ def validate_eps(eps=1):
     # Initialize environment object
     parsed_args = parse_arguments()
     model_dir = parsed_args.model
+    save_results = parsed_args.write
 
     spec=importlib.util.spec_from_file_location("cfg",os.path.join(model_dir,"hyperparams.py"))
     cfg =  importlib.util.module_from_spec(spec)
@@ -246,18 +249,20 @@ def validate_eps(eps=1):
     # Close environment    
     env.close_connection()
 
-def just_run(steps=30,restart_done=True):   
+def just_run(steps=30,alg='greedy'):   
 
     # Initialize environment object
     parsed_args = parse_arguments()
     model_dir = parsed_args.model
+    save_results = parsed_args.write
+    alg = parsed_args.alg
 
     spec=importlib.util.spec_from_file_location("cfg",os.path.join(model_dir,"hyperparams.py"))
     cfg =  importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cfg)
 
 
-    params = customized_params(cfg.PARAMETERS['SimDRLSR'])
+    params = customized_params(cfg.PARAMETERS['SimDRLSR'],save_results)
     #check_consistency_in_configuration_parameters(params)
     env_name = params['env_name']
 
@@ -270,7 +275,8 @@ def just_run(steps=30,restart_done=True):
     start_simulator = False
     if(not parsed_args.sim==''):
         start_simulator = True
-    env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator)
+    env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port'])
+    #env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator)
 
 
     # Reset the environment
@@ -285,6 +291,7 @@ def just_run(steps=30,restart_done=True):
     print('Number of agents  : ', number_of_agents)
     print('Number of actions : ', action_size)
     print('Dimension of state space : ', state_size)
+    print('Politc: ',alg    )
 
     # Initialize agent
     agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
@@ -321,7 +328,13 @@ def just_run(steps=30,restart_done=True):
     # Capture the current state
     gray_state,_ = env.get_screen()
 
-
+    total_score = 0
+    eps_count = 1
+    step = 1
+    handshake_success = 0
+    handshake_fail = 0
+    wave_success = 0
+    wave_fail = 0
     for step in range(1, steps+1):
 
         # Reset the environment
@@ -332,7 +345,10 @@ def just_run(steps=30,restart_done=True):
         done = False
 
         # Action selection by Epsilon-Greedy policy
-        action = agent.greedy(gray_state)
+        if(alg=='random'):
+            action = agent.eGreedy(gray_state,1)
+        else:
+            action = agent.eGreedy(gray_state,0)
         
         reward, done = env.execute(action)
         next_gray_state,_ = env.get_screen()
@@ -351,22 +367,56 @@ def just_run(steps=30,restart_done=True):
         gray_state = next_gray_state
 
         # Update total score
+        if(reward == -1):
+            reward = 0
+
+        print(action)
+        if(int(action)==3):
+            if(reward>=0):
+                handshake_success+=1
+            else:
+                handshake_fail+=1
+        if(int(action)==2):
+            if(reward>=0):
+                wave_success+=1
+            else:
+                wave_fail+=1
         score += reward
+        total_score += score
+        print("**************************")
+        print("Partial Score: \t"+str(total_score))
+        print("HS Success: \t"+str(handshake_success))
+        print("HS Fail: \t"+str(handshake_fail))
+        print("Wv Success: \t"+str(wave_success))
+        print("Wv Fail: \t"+str(wave_fail))
+        print("Nº Eps: \t"+str(eps_count))
+        print("Nº Steps: \t"+str(step))
+        print("**************************")
         if(done):
             done = False
             env.reset(restart_simulator=True)
             # Capture the current state
             gray_state,_ = env.get_screen()
+            eps_count+=1
+
 
             
-
+    print("**************************")
+    print("Partial Score: \t"+str(total_score))
+    print("HS Success: \t"+str(handshake_success))
+    print("HS Fail: \t"+str(handshake_fail))
+    print("Wv Success: \t"+str(wave_success))
+    print("Wv Fail: \t"+str(wave_fail))
+    print("Nº Eps: \t"+str(eps_count))
+    print("Nº Steps: \t"+str(step))
+    print("**************************")
     # Push to score list
     actions_rewards.append( ep_actions_rewards)
     if(save_social_states):
         social_signals.append(ep_social_state)
 
-    save_action_reward_history(actions_rewards)
     if(save_social_states):
+        save_action_reward_history(actions_rewards)
         save_social_signals_states(social_signals)
     # Close environment    
     env.close_connection()
@@ -374,24 +424,22 @@ def just_run(steps=30,restart_done=True):
 
 
 
-def customized_params(params):
+def customized_params(params,save_results):
     params['screen_width'] = 1080
     params['screen_height'] = 768
     params['simulation_speed'] = 1
-    params['save_social_states'] = True
-    params['save_images'] = True
+    params['save_social_states'] = save_results
+    params['save_action_reward_history'] = save_results
+    params['save_images'] = save_results
     params['socket_time_out'] =20.0
 
     return params 
 
 
 
-
-    
-
 def main():
     #validate_eps(1)
-    just_run(steps=100)
+    just_run(steps=500)
 
 if __name__ == "__main__":      
     main()
