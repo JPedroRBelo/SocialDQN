@@ -427,7 +427,7 @@ def just_run(steps=30,alg='greedy'):
 def customized_params(params,save_results):
     params['screen_width'] = 1080
     params['screen_height'] = 768
-    params['simulation_speed'] = 1
+    params['simulation_speed'] = 10
     params['save_social_states'] = save_results
     params['save_action_reward_history'] = save_results
     params['save_images'] = save_results
