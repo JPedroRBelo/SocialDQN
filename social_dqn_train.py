@@ -337,7 +337,7 @@ def main(cfg):
                 #if(int(time_now)%20==0):
                 #   print(thread_log)
 
-            if(ep_count % params['save_interval'] == 0 ):
+            if(ep_count % params['save_interval'] == 0 ) and (ep_count>0):
                 # Export scores to csv file
                 df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
                 df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
