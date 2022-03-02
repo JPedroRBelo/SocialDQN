@@ -39,13 +39,22 @@ class MultimodalReplayBuffer():
         """Randomly sample a batch of experiences from memory."""
         experiences = random.sample(self.memory, k=self.batch_size)
 
-        gray_states = torch.from_numpy(np.vstack([e.gray_state for e in experiences if e is not None])).float().to(self.device)
-        depth_states = torch.from_numpy(np.vstack([e.depth_state for e in experiences if e is not None])).float().to(self.device)
+        gray_images = torch.from_numpy(np.vstack([e.gray_state[0] for e in experiences if e is not None])).float().to(self.device)
+        gray_social_signals = torch.from_numpy(np.vstack([e.gray_state[1] for e in experiences if e is not None])).float().to(self.device)
+        depth_images = torch.from_numpy(np.vstack([e.depth_state[0] for e in experiences if e is not None])).float().to(self.device)
+        depth_social_signals = torch.from_numpy(np.vstack([e.depth_state[1] for e in experiences if e is not None])).float().to(self.device)
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(self.device)
         rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(self.device)
-        next_gray_states = torch.from_numpy(np.vstack([e.next_gray_state for e in experiences if e is not None])).float().to(self.device)
-        next_depth_states = torch.from_numpy(np.vstack([e.next_depth_state for e in experiences if e is not None])).float().to(self.device)
+        next_gray_images = torch.from_numpy(np.vstack([e.next_gray_state[0] for e in experiences if e is not None])).float().to(self.device)
+        next_gray_social_signals = torch.from_numpy(np.vstack([e.next_gray_state[1] for e in experiences if e is not None])).float().to(self.device)
+        next_depth_images = torch.from_numpy(np.vstack([e.next_depth_state[0] for e in experiences if e is not None])).float().to(self.device)
+        next_depth_social_signals = torch.from_numpy(np.vstack([e.next_depth_state[1] for e in experiences if e is not None])).float().to(self.device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(self.device)
+        gray_states = [gray_images,gray_social_signals]
+        depth_states = [depth_images,depth_social_signals]
+        next_gray_states = [next_gray_images,next_gray_social_signals]
+        next_depth_states = [next_depth_images,next_depth_social_signals]
+        #return (states, actions, rewards, next_states, dones)
 
         return (gray_states, depth_states, actions, rewards, next_gray_states, next_depth_states, dones)
 
