@@ -91,9 +91,7 @@ class Environment:
 		count = 0	
 		while(not flag_connection):
 			try:
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				client =skt.connect((host, self.port))
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				flag_connection = True
 				return skt,client
 			except socket.error:
@@ -113,15 +111,11 @@ class Environment:
 		self.config_simulation("use_depth"+str(self.use_depth_state))
 
 	def connect(self):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.socket,self.client = self.__connect()
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		timeout = 5
 		ready_sockets, _, _ = select.select([self.socket], [], [], timeout)
 		if ready_sockets:
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			data = self.socket.recv(1024)
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			print("Junk: "+str(data))
 
 
@@ -187,23 +181,17 @@ class Environment:
 
 	
 	def send_data_to_pepper(self,data):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		action = self.params['actions'][data]
 		self.socket.send(action.encode())
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while True:
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.settimeout(self.socket_time_out )
 			reward = self.socket.recv(1024).decode()
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if reward:
 				try:
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					reward_value = float(reward.replace(',','.'))
 					print(reward_value)
 					return reward_value
 				except (ValueError, TypeError):
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					print("Reward error")
 					continue				
 			break
@@ -214,23 +202,17 @@ class Environment:
 		if self.verbose: 
 			print('{} Simulator: {}'.format(text,data))
 		done = False;
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while not done:
 			try: 
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				self.socket.send(data.encode())
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			except Exception:
 				print("Connection Exception")
 				return 0
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 			while (True):
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				self.socket.settimeout(self.socket_time_out)
 				msg = self.socket.recv(1024)
 				msg = msg.decode()
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				if msg:
 					return float(msg.replace(',','.').replace('\n',''))
 
@@ -243,15 +225,12 @@ class Environment:
 
 		data = "reset"
 		done = False;
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while not done:
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			try: 
 				self.socket.send(data.encode())
 			except Exception:
 				print("Connection Exception")
 				return -1
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 			while True:
 				
@@ -274,16 +253,12 @@ class Environment:
 
 	def execute(self,data):
 		action = self.params['actions'][data]
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.socket.send(action.encode())
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		terminal = False
 		
 		while True:
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.settimeout(self.socket_time_out)
 			data = self.socket.recv(1024).decode()
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if data:
 				if("reward" in data):
 					original_data = str(data)
@@ -318,14 +293,10 @@ class Environment:
 		s = []
 		d = []
 		face_count = []
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.socket.send('get_screen'.encode())
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		while True:		
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.settimeout(self.socket_time_out)
 			recv = self.socket.recv(1024)
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			if(recv):
 				break;
 		counter = 0
@@ -339,26 +310,18 @@ class Environment:
 
 		for i in range(n_channels*self.state_size):
 			size = 0
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.send('next_size'.encode())
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			while True:	
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				self.socket.settimeout(self.socket_time_out)						
 				recv = self.socket.recv(6)
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				recv = recv.decode().rstrip("\n")
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				if recv.isdigit():
 					size = int(recv)#.decode()
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					if size != 0:
 						break;
 			#self.socket.send('next'.encode())
 
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.send('next_image'.encode())		
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			data_img = self.receive_image(size)
 			if(not self.blind_mode):
 				image = self.convert_to_image(data_img)
@@ -369,9 +332,7 @@ class Environment:
 				if(image == None):
 					n_tries += 1
 					#print("Image error: ",str(i))
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					self.socket.send('last_image'.encode())
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					data_img= self.receive_image(size)
 					image = self.convert_to_image(data_img)
 					if(n_tries>3):
@@ -384,16 +345,12 @@ class Environment:
 			if(counter%n_channels==0):
 				#num_faces = self.SocialSigns.find_faces(image)
 				#face= num_faces
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				self.socket.send('next_emotion'.encode())
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 				face = 'no_face'
 				while True:
 					
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					self.socket.settimeout(self.socket_time_out)
 					msg = self.socket.recv(1024).decode()
-					if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 					if msg:				
 						face = msg.replace('\n','')
 					break
@@ -422,7 +379,6 @@ class Environment:
 				
 			counter += 1
 		emotion = self.most_common(face_count)
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		emotion_one_hot = self.get_one_hot_vector(emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
 		s = self.pre_process(states_gray)
@@ -431,7 +387,6 @@ class Environment:
 			d = self.pre_process(states_depth)
 		if(self.use_only_depth_state):
 			s = d
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		s = [s,face_state]
 		return s,d
 
@@ -441,13 +396,10 @@ class Environment:
 	def receive_image(self,size):
 		read = 0
 		while True:			
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			self.socket.settimeout(self.socket_time_out)	
 			recv = self.socket.recv(size)
-			if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 			read += len(recv)
-			if(read>=size):	
-				if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))				
+			if(read>=size):					
 				break
 		return recv	
 
@@ -470,31 +422,23 @@ class Environment:
 
 	
 	def close_connection(self):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.close_simulator()	
 		self.socket.close()
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 	def close(self):
 		self.socket.close()
 
 	def init_simulator(self,command):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.process = self.openSim(command,self.process)
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 	def close_simulator(self):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		self.killSim(self.process)
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 
 
 
 	def openSim(self,command,process):
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		process.terminate()
 		process = Popen(command, shell=True, preexec_fn=os.setsid)
-		if(self.debug): print("Port: "+str(self.port)+" Line: "+str(getframeinfo(currentframe()).lineno))
 		return process
 
 	def killSim(self,process):

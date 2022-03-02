@@ -888,9 +888,9 @@ def main2(save=True):
 	labels.append("1")
 	#75k rb
 	#folders.append('results/20220108_182042')
-	folders.append('results/20220209_201938')
-	folders.append('results/20220209_201938')
-	folders.append('results/20220209_201938')
+	folders.append('results/20220214_052339')
+	folders.append('results/20220214_052339')
+	folders.append('results/20220214_052339')
 
 
 
@@ -1006,8 +1006,9 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 	for fol,l in zip(folders,labels): 
 		files = os.path.join(fol,'scores')
 		folder_content = os.listdir(files)
-		filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+		filename = 'NeuralQLearner_simDRLSR'
 		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+		print(candidates)
 		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
 		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
 
@@ -1036,7 +1037,7 @@ def extract_cumulative_rewards_by_emotion(folder,label):
 	emotions = torch.load(emotion_pth)
 	files = os.path.join(folder,'scores')
 	folder_content = os.listdir(files)
-	filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
+	filename = 'NeuralQLearner_simDRLSR_batch'
 	candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
 	score = pd.read_csv(os.path.join(folder,'scores',candidates[-1]), sep=',',nrows=MAX_EPS)
 	print(candidates[-1])
@@ -1137,7 +1138,8 @@ def cumulative():
 	
 	#labels.append("Simulator X1: 64 batch size")
 	labels.append("SocialDQN: Culmulative Rewards")
-	folders.append('results/20220209_201938')
+	#folders.append('results/20220209_201938')
+	folders.append('results/20220214_052339')
 	#labels.append("Simulator X2: 128 batch size")
 	#folders.append('results/20220208_040251')
 	

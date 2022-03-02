@@ -27,7 +27,7 @@ PARAMETERS = {
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
-        'save_interval':        1000,
+        'save_interval':        15000,
 
         'socket_time_out':      20.0,
 
