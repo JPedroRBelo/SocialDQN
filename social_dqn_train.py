@@ -4,7 +4,9 @@ from threading import Thread
 # Config
 #from agent.DoubleQLearner import Agent
 from agent.SocialNQLearner import Agent
+from agent.MultimodalNeuralQLearner import MultimodalAgent
 from agent.ExperienceReplay import ReplayBuffer
+from agent.ExperienceReplay import MultimodalReplayBuffer
 from config.hyperparams import *
 from environment.SimEnvironment import Environment
 
@@ -186,30 +188,31 @@ def main(cfg):
         if(not parsed_args.sim==''):
             start_simulator = True
 
-        # Reset the environment
-
-
         # Get environment parameter
         number_of_agents = params['number_of_agents']
         action_size = params['action_size']
         state_size = params['state_size']
         train_after_episodes = params['train_after_episodes']
+        use_depth_state = params['use_depth_state']
+        use_only_depth_state = params['use_only_depth_state']
+
 
         print('Number of agents  : ', number_of_agents)
         print('Number of actions : ', action_size)
         print('Dimension of state space : ', state_size)
 
 
+        if(use_depth_state) and (not use_only_depth_state):
+            #Multimodal states
+            # Initialize agent
+            agent = MultimodalAgent(state_size=state_size, action_size=action_size, param=params, seed=0,)
+            # Initialize replay buffer
+            memory = MultimodalReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
+        else:
+            agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
+            # Initialize replay buffer
+            memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
 
-
-
-
-
-        # Initialize agent
-        agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
-
-        # Initialize replay buffer
-        memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
         update_interval = params['update_interval']
         replay_start = params['replay_initial']
 
@@ -408,7 +411,13 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         while not done:
             
             # Action selection by Epsilon-Greedy policy
-            action = agent.eGreedy(gray_state,epsilon)
+            if(isinstance(agent,Agent)):
+                action = agent.eGreedy(gray_state,epsilon)
+            elif(isinstance(agent,MultimodalAgent)):
+                action = agent.eGreedy(gray_state,depth_state,epsilon)
+            else:
+                error('Unknown Agent Type!')
+
             #action = agent.select_action(gray_state,depth_state)    
             try:         
                 reward, done = env.execute(action)   
@@ -432,7 +441,13 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
                     depth_thread.start()
 
             # Store experience
-            memory.push(gray_state, action, reward, next_gray_state, done)
+            if(isinstance(memory,ReplayBuffer)):
+                memory.push(gray_state, action, reward, next_gray_state, done)
+            elif(isinstance(memory,MultimodalReplayBuffer)):
+                memory.push(gray_state,depth_state, action, reward, next_gray_state,next_depth_state, done)
+            else:
+                error('Unknown ReplayBuffer Type!')
+
             
             ep_actions_rewards.append([action,reward])
             
