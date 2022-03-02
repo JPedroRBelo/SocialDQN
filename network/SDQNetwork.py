@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class DQN(nn.Module):
-	def __init__(self,params):
+	def __init__(self,params,enable_social_signs=None):
 		super(DQN, self).__init__()
 		self.noutputs=params['action_size']
 		self.nfeats=params['state_size']
@@ -17,7 +17,10 @@ class DQN(nn.Module):
 		self.kernels=params['kernels']
 		self.strides=params['strides']
 		self.poolsize=params['poolsize']
-		self.enable_social_signs=params['enable_social_signs']
+		if enable_social_signs==None:
+			self.enable_social_signs=params['enable_social_signs']
+		else:
+			self.enable_social_signs=enable_social_signs
 		self.nstates_social = params['nstates_social']
 		self.social_state_size = params['social_state_size']
 

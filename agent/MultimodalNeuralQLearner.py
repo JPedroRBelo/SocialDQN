@@ -9,9 +9,10 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from network.Network import *
+from network.SDQNetwork import *
 import torch.nn as nn
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 # -------------------------------------------------------------------- #
@@ -28,7 +29,7 @@ class MultimodalAgent():
             action_size (int): dimension of each action
             seed (int): random seed
         """
-        self.name = 'NeuralQLearner'
+        self.name = 'MultimodalNeuralQLearner'
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
@@ -42,10 +43,10 @@ class MultimodalAgent():
         #self.Q_network_target = QNetwork(state_size, action_size, param['hidden_layers'], seed).to(self.device)
         self.gray_Q_network = DQN(param)
         self.gray_Q_network_target = DQN(param)
-        self.depth_Q_network = DQN(param)
-        self.depth_Q_network_target = DQN(param)
-        self.gray_optimizer = optim.RMSprop(self.gray_Q_network.parameters(), lr=param['learning_rate'])
-        self.depth_optimizer = optim.RMSprop(self.depth_Q_network.parameters(), lr=param['learning_rate'])
+        self.depth_Q_network = DQN(param,enable_social_signs=False)
+        self.depth_Q_network_target = DQN(param,enable_social_signs=False)
+        self.gray_optimizer = optim.Adam(self.gray_Q_network.parameters(), lr=param['learning_rate'])
+        self.depth_optimizer = optim.Adam(self.depth_Q_network.parameters(), lr=param['learning_rate'])
         #self.optimizer = optim.RMSprop(self.Q_network.parameters(), lr=param['learning_rate'])
 
         # Initialize update parameters
