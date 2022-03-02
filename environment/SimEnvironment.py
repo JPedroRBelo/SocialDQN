@@ -387,6 +387,8 @@ class Environment:
 			d = self.pre_process(states_depth)
 		if(self.use_only_depth_state):
 			s = d
+		if(d != None):
+			d = [d,face_state]
 		s = [s,face_state]
 		return s,d
 
