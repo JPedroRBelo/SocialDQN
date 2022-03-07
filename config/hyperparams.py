@@ -11,8 +11,8 @@ PARAMETERS = {
         't_steps':              25,
         'screen_width':         320,
         'screen_height':        240,
-        'frame_height':         320,
-        'frame_width':          240,
+        'frame_height':         264,
+        'frame_width':          198,
         'frame_size':           198,
         'quality':              "very low",
         'port':                 12375,
@@ -23,7 +23,7 @@ PARAMETERS = {
         'stop_scores':          1.0,
         'scores_window_size':   100,
         'train_episodes':       15000,
-        'save_images':          False,
+        'save_images':          True,
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
@@ -37,7 +37,7 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  True,
+        'enable_social_signs':  False,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
@@ -46,7 +46,7 @@ PARAMETERS = {
 
 
 
-        'replay_size':          50000,             # replay buffer size
+        'replay_size':          30000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize

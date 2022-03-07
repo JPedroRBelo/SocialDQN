@@ -233,9 +233,6 @@ def main(cfg):
         actions_rewards = [None] * episodes  
         social_signals = [None] * episodes  
 
-
-
-
         for i in range(number_of_agents):
             envs.append(Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port']+i))
             #envs[-1].reset()
@@ -437,7 +434,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
                     gray_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'gray',next_gray_state[0]))
                     gray_thread.start()
                 if(next_depth_state!=None):
-                    depth_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'depth',next_depth_state))                    
+                    depth_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'depth',next_depth_state[0]))                    
                     depth_thread.start()
 
             # Store experience
