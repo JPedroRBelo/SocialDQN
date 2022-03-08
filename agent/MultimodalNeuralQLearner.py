@@ -77,9 +77,9 @@ class MultimodalAgent():
         for i in range(self.action_size):
             tg += gray_action_values[i]
             td += depth_action_values[i]
-        #ng = gray_action_values/(gray_action_values.max()/1.0)
-        #nd = depth_action_values/(depth_action_values.max()/1.0)
-        q_fus=((tg)*0.5)+((td)*0.5)
+        ng = gray_action_values/tg
+        nd = depth_action_values/td
+        q_fus=((ng)*0.5)+((nd)*0.5)
         action = np.argmax(q_fus.cpu().data.numpy())
         return action
 
