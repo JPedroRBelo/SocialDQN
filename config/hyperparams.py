@@ -44,6 +44,8 @@ PARAMETERS = {
         'emotional_states':     ['no_face','neutral','positive','negative'],
         'facial_states':        ['no_face','face'],
 
+        'emotion_type':         'enjoyment',
+
 
 
         'replay_size':          30000,             # replay buffer size
