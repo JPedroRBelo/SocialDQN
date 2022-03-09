@@ -48,6 +48,7 @@ class Environment:
 		self.use_only_depth_state = params['use_only_depth_state']
 		self.emotional_states = params['emotional_states']
 		self.facial_states = params['facial_states']
+		self.emotion_type= params['emotion_type']
 		series = pd.Series(self.emotional_states)
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
@@ -109,6 +110,7 @@ class Environment:
 		self.config_simulation("reward eg_success:"+str(self.eg_success_reward))
 		self.config_simulation("reward eg_fail:"+str(self.eg_fail_reward))
 		self.config_simulation("use_depth"+str(self.use_depth_state))
+		self.config_simulation("emotion_type"+str(self.emotion_type))
 
 	def connect(self):
 		self.socket,self.client = self.__connect()
