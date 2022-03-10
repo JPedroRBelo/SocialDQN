@@ -49,6 +49,7 @@ class Environment:
 		self.emotional_states = params['emotional_states']
 		self.facial_states = params['facial_states']
 		self.emotion_type= params['emotion_type']
+		self.robot_random_position = params['robot_random_position']
 		series = pd.Series(self.emotional_states)
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
@@ -111,6 +112,7 @@ class Environment:
 		self.config_simulation("reward eg_fail:"+str(self.eg_fail_reward))
 		self.config_simulation("use_depth"+str(self.use_depth_state))
 		self.config_simulation("emotion_type"+str(self.emotion_type))
+		self.config_simulation("robot_random_position"+str(self.robot_random_position))
 
 	def connect(self):
 		self.socket,self.client = self.__connect()

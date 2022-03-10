@@ -10,9 +10,9 @@ PARAMETERS = {
         'state_size':           8,
         't_steps':              25,
         'screen_width':         320,
-        'screen_height':        240,
+        'screen_height':        320,
         'frame_height':         264,
-        'frame_width':          198,
+        'frame_width':          240,
         'frame_size':           198,
         'quality':              "very low",
         'port':                 12375,
@@ -44,11 +44,12 @@ PARAMETERS = {
         'emotional_states':     ['no_face','neutral','positive','negative'],
         'facial_states':        ['no_face','face'],
 
-        'emotion_type':         'enjoyment',
+        #SimDRLSR config
+        #Neutral,Anger,Contempt,Enjoyment,Fear,Sadness,Surprise,random
+        'emotion_type':         'random',
+        'robot_random_position': False,
 
-
-
-        'replay_size':          30000,             # replay buffer size
+        'replay_size':          35000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
