@@ -10,7 +10,7 @@ PARAMETERS = {
         'state_size':           8,
         't_steps':              25,
         'screen_width':         320,
-        'screen_height':        320,
+        'screen_height':        240,
         'frame_height':         264,
         'frame_width':          240,
         'frame_size':           198,
