@@ -4,7 +4,7 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     1,
+        'simulation_speed':     0.5,
         'number_of_agents':     15,
         'action_size':          4,
         'state_size':           8,
@@ -49,7 +49,7 @@ PARAMETERS = {
         'emotion_type':         'random',
         'robot_random_position': False,
 
-        'replay_size':          35000,             # replay buffer size
+        'replay_size':          30000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       300,              # replay buffer initialize
