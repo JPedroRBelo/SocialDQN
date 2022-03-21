@@ -5,7 +5,7 @@ PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
         'simulation_speed':     1,
-        'number_of_agents':     15,
+        'number_of_agents':     1,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -61,7 +61,8 @@ PARAMETERS = {
 
 
 
-        'epsilon_start':        1.0,                # starting value of epsilon
+        #'epsilon_start':        1.0,                # starting value of epsilon
+        'epsilon_start':        0.01,                # starting value of epsilon
         'epsilon_final':        0.05,               # minimum value of epsilon
         'epsilon_decay':        0.999,              # factor for decreasing epsilon
 

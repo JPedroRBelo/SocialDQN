@@ -72,14 +72,21 @@ class MultimodalAgent():
         self.gray_Q_network.train()
         self.depth_Q_network.train()
         # Greedy action selection
+
+        '''
         tg = 0
         td = 0
+        
         for i in range(self.action_size):
             tg += gray_action_values[i]
             td += depth_action_values[i]
         ng = gray_action_values/tg
         nd = depth_action_values/td
         q_fus=((ng)*0.5)+((nd)*0.5)
+        ''' 
+        fc_out = torch.nn.Linear((self.action_size*2), self.action_size)
+        x_fus =torch.cat((gray_action_values,depth_action_values),0)
+        q_fus = fc_out(x_fus)
         action = np.argmax(q_fus.cpu().data.numpy())
         return action
 
