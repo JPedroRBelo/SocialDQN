@@ -4,7 +4,7 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     0.5,
+        'simulation_speed':     1,
         'number_of_agents':     15,
         'action_size':          4,
         'state_size':           8,
@@ -37,7 +37,7 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
