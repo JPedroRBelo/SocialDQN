@@ -57,6 +57,11 @@ class MultimodalAgent():
         # Print model summary
         #print(self.Q_network)
 
+    def normalize(self,values):
+        norm = [(float(i)-min(values))/(max(values)-min(values)) for i in values]
+        return (np.array(norm))
+
+
     def greedy(self, gray_state,depth_state):
         """Returns actions for given state as per current policy.
         Params
@@ -84,10 +89,11 @@ class MultimodalAgent():
         nd = depth_action_values/td
         q_fus=((ng)*0.5)+((nd)*0.5)
         ''' 
-        fc_out = torch.nn.Linear((self.action_size*2), self.action_size)
-        x_fus =torch.cat((gray_action_values,depth_action_values),0)
-        q_fus = fc_out(x_fus)
-        action = np.argmax(q_fus.cpu().data.numpy())
+        norm_a = self.normalize(gray_action_values)
+        norm_b = self.normalize(depth_action_values)
+        q_fus=((norm_a)*0.5)+((norm_b)*0.5)
+        #action = np.argmax(q_fus.cpu().data.numpy())
+        action = np.argmax(q_fus)
         return action
 
 
