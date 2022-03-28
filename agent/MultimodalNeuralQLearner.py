@@ -45,9 +45,11 @@ class MultimodalAgent():
         self.gray_Q_network_target = DQN(param)
         self.depth_Q_network = DQN(param,enable_social_signs=False)
         self.depth_Q_network_target = DQN(param,enable_social_signs=False)
-        self.gray_optimizer = optim.Adam(self.gray_Q_network.parameters(), lr=param['learning_rate'])
-        self.depth_optimizer = optim.Adam(self.depth_Q_network.parameters(), lr=param['learning_rate'])
+        #self.gray_optimizer = optim.Adam(self.gray_Q_network.parameters(), lr=param['learning_rate'])
+        #self.depth_optimizer = optim.Adam(self.depth_Q_network.parameters(), lr=param['learning_rate'])
         #self.optimizer = optim.RMSprop(self.Q_network.parameters(), lr=param['learning_rate'])
+        self.gray_optimizer = optim.RMSprop(self.gray_Q_network.parameters(), lr=param['learning_rate'])
+        self.depth_optimizer = optim.RMSprop(self.depth_Q_network.parameters(), lr=param['learning_rate'])
 
         # Initialize update parameters
         self.t_updates = 0

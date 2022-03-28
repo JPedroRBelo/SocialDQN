@@ -7,7 +7,6 @@ MDQN Tests
 'replay_size':          30000,            
 'neutral_reward':       0,
 'hs_success_reward':    1,
-'hs_fail_reward':       -0.2,
 'eg_success_reward':    0,
 'eg_fail_reward':       -0.1,
 'ep_fail_reward':       -1
@@ -42,6 +41,8 @@ MDQN without emotions. Without aditional Rewards. HS fail -0.2
 ################################################################################################
 # NEXT
 # 
+
+RMSprop
 
 ###Testing SimDRLSR v0.331####
 SocialDQN
