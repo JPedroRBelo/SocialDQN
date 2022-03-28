@@ -781,10 +781,16 @@ def main(save=False):
 	
 	
 	#labels.append("Simulator X1: 64 batch size")
-	labels.append("SocialDQN: Culmulative Rewards")
-	folders.append('results/20220209_201938')
+	#labels.append("SocialDQN: Culmulative Rewards")
+	#folders.append('results/20220209_201938')
 	#labels.append("Simulator X2: 128 batch size")
 	#folders.append('results/20220208_040251')
+
+	folders.append('results/20220324_172505')
+	folders.append('results/20220327_121704')
+	labels.append('SocialMDQN')
+	labels.append('MDQN')
+
 	
 	
 
@@ -905,6 +911,7 @@ def main2(save=True):
 
 	#labels.append("Only face state (no emotions). Sim with emotions")
 	#folders.append('results/20220115_101708')
+	
 
 	calc_with_emotions(folders,labels)
 	params = PARAMETERS['SimDRLSR']
@@ -1006,7 +1013,8 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 	for fol,l in zip(folders,labels): 
 		files = os.path.join(fol,'scores')
 		folder_content = os.listdir(files)
-		filename = 'NeuralQLearner_simDRLSR'
+		#filename = 'NeuralQLearner_simDRLSR'
+		filename = 'MultimodalNeuralQLearner_simDRLSR'		
 		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
 		print(candidates)
 		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
@@ -1172,8 +1180,6 @@ def main3(save=True):
 	folders.append('results/20220209_201938')
 	folders.append('results/20220209_201938')
 
-
-
 	labels.append("2")
 	#75k rb
 	#folders.append('results/20220108_182042')
@@ -1190,7 +1196,7 @@ def main3(save=True):
 	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 if __name__ == "__main__":
-	#main(save=True)
-	main2()
+	main(save=True)
+	#main2()
 	#cumulative()
 
