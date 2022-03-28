@@ -80,10 +80,10 @@ PARAMETERS = {
 
         'neutral_reward':       0,
         'hs_success_reward':    1,
-        'hs_fail_reward':       -0.2,
+        'hs_fail_reward':       -0.1,
         'eg_success_reward':    0,
         'eg_fail_reward':       0,
-        'ep_fail_reward':       -1
+        'ep_fail_reward':       0
     },
 }
 # -------------------------------------------------------------------- #
