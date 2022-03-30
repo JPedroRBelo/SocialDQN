@@ -103,7 +103,7 @@ def validate_eps(eps=1):
         ep_actions_rewards.append([action,reward])
 
         
-    save_action_reward_history(os.path.join(path,'scores'),ep_actions_rewards)
+    #save_action_reward_history(os.path.join(path,'scores'),ep_actions_rewards)
 
 
     
@@ -126,7 +126,7 @@ def customized_params(params,save_results):
 
 def main():
     #validate_eps(1)
-    validate_eps(150)
+    validate_eps(1)
 
 if __name__ == "__main__":      
     main()
