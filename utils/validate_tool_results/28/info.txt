@@ -1,0 +1,4 @@
+Pure MDQN
+results/20220401_200543
+MDQN without depth
+results/20220403_173206
