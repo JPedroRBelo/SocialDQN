@@ -786,12 +786,20 @@ def main(save=False):
 	#labels.append("Simulator X2: 128 batch size")
 	#folders.append('results/20220208_040251')
 
+	'''
 	folders.append('results/20220324_172505')
 	folders.append('results/20220327_121704')
 	labels.append('SocialMDQN')
 	labels.append('MDQN')
+	'''
 
-	
+	#folders.append('results/20220407_090416')
+	#labels.append('MDQN x0.5')
+	folders.append('results/20220401_200543')
+	#labels.append('MDQN x1.0')
+	labels.append('Pure MDQN')
+	folders.append('results/20220403_173206')
+	labels.append('MDQN without depth')
 	
 
 	calc_all_scores(folders,labels)
@@ -1006,6 +1014,10 @@ def main2(save=True):
 				else:
 					print('\nIncorrect key...')
 
+def find_files_candidates(filename,folder_content):
+
+	candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+	return candidates
 
 def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 
@@ -1015,7 +1027,10 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 		folder_content = os.listdir(files)
 		#filename = 'NeuralQLearner_simDRLSR'
 		filename = 'MultimodalNeuralQLearner_simDRLSR'		
-		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+		candidates = find_files_candidates(filename,folder_content)
+		if(len(candidates)==0):
+			filename = 'NeuralQLearner_simDRLSR'		
+			candidates = find_files_candidates(filename,folder_content)
 		print(candidates)
 		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
 		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
