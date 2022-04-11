@@ -4,8 +4,8 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     0.5,
-        'number_of_agents':     15,
+        'simulation_speed':     1,
+        'number_of_agents':     20,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -32,7 +32,7 @@ PARAMETERS = {
         'socket_time_out':      20.0,
 
         #Multimodal DQN: get detph states
-        'use_depth_state':      True,
+        'use_depth_state':      False,
         'use_only_depth_state': False,
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
