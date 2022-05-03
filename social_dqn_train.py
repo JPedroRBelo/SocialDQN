@@ -497,5 +497,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###Testing SimDRLSR v0.331####\nSocialDQN\nMDQN without emotions. Without aditional Rewards. HS fail -0.1\nSocialDQN. 30 simulation instances'
+    notes = '###Testing SimDRLSR v0.331####\nSocialDQN\nMDQN without emotions. Without aditional Rewards. HS fail -0.1\nSocialDQN. 25 simulation instances'
     save_train_files(cfg,notes)
