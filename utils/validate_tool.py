@@ -914,9 +914,9 @@ def main2(save=True):
 	#75k rb
 	#folders.append('results/20220108_182042')
 	#folders.append('results/20220214_052339')
-	folders.append('results/20220330_155521')
-	folders.append('results/20220330_155521')
-	folders.append('results/20220330_155521')
+	#folders.append('results/20220330_155521')
+	#folders.append('results/20220330_155521')
+	folders.append('results/20220421_081239')
 
 	#mdqn = 20220330_155521
 
