@@ -900,7 +900,9 @@ def main(save=False):
 					print('\nIncorrect key...')
 
 def convert_one_hot_to_number(value):
+
 	i = list(value).index(1)
+	print(value)
 	return i
 
 def main2(save=True):
@@ -1068,7 +1070,7 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 
 def extract_cumulative_rewards_by_emotion(folder,label):
 	emotion_pth = os.path.join(folder,'scores','social_signals_history.dat')
-	emotions = torch.load(emotion_pth)[0]
+	emotions = torch.load(emotion_pth)
 	print(emotions)
 	files = os.path.join(folder,'scores')
 	folder_content = os.listdir(files)
@@ -1095,6 +1097,7 @@ def extract_cumulative_rewards_by_emotion(folder,label):
 		for step in range(len(emotions[i])):		
 			if(len(emotions[i])>0 ):
 				emotion = emotions[i][step].numpy()
+				print(emotion)
 				n_emotion = convert_one_hot_to_number(emotion[0])
 				if(n_emotion>0):
 					emotion_ep = n_emotion
