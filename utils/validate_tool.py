@@ -169,6 +169,7 @@ def plot_culmulative(scores,name,params,i_episode,save=False,save_location=''):
 	for scr,legend in scores:
 		df = pandas.DataFrame(scr,columns=['scores','average_scores','std'])
 		maxlen = min(maxlen,len(df['scores']))
+	print(maxlen)
 	episode = np.arange(maxlen)
 	for scr,legend in scores:
 		df = pandas.DataFrame(scr,columns=['scores','average_scores','std'])
@@ -453,8 +454,14 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 		files = os.path.join(fol,'scores')
 		folder_content = os.listdir(files)
 		#filename = 'NeuralQLearner_simDRLSR_batch_128_lr_3E-04_trained'
-		filename = 'NeuralQLearner_simDRLSR_batch'
-		candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+		#filename = 'NeuralQLearner_simDRLSR_batch'
+		filename = 'MultimodalNeuralQLearner_simDRLSR'		
+		candidates = find_files_candidates(filename,folder_content)
+		if(len(candidates)==0):
+			filename = 'NeuralQLearner_simDRLSR'		
+			candidates = find_files_candidates(filename,folder_content)
+		print(candidates)
+		#candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
 		score = pd.read_csv(os.path.join(fol,'scores',candidates[0]), sep=',',nrows=MAX_EPS)
 		scores.append([calc_average_scores(score['scores'],maxlen=250),l])
 
@@ -793,13 +800,15 @@ def main(save=False):
 	labels.append('MDQN')
 	'''
 
+	folders.append('results/20220330_155521')
+	labels.append('MDQN')
 	#folders.append('results/20220407_090416')
 	#labels.append('MDQN x0.5')
 	folders.append('results/20220401_200543')
 	#labels.append('MDQN x1.0')
-	labels.append('Pure MDQN')
+	labels.append('MDQN with Emotions')
 	folders.append('results/20220403_173206')
-	labels.append('MDQN without depth')
+	labels.append('SocialDQN')
 	
 
 	calc_all_scores(folders,labels)
@@ -902,10 +911,12 @@ def main2(save=True):
 	labels.append("1")
 	#75k rb
 	#folders.append('results/20220108_182042')
-	folders.append('results/20220214_052339')
-	folders.append('results/20220214_052339')
-	folders.append('results/20220214_052339')
+	#folders.append('results/20220214_052339')
+	folders.append('results/20220330_155521')
+	folders.append('results/20220330_155521')
+	folders.append('results/20220330_155521')
 
+	#mdqn = 20220330_155521
 
 
 	labels.append("2")
@@ -1057,11 +1068,19 @@ def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
 
 def extract_cumulative_rewards_by_emotion(folder,label):
 	emotion_pth = os.path.join(folder,'scores','social_signals_history.dat')
-	emotions = torch.load(emotion_pth)
+	emotions = torch.load(emotion_pth)[0]
+	print(emotions)
 	files = os.path.join(folder,'scores')
 	folder_content = os.listdir(files)
-	filename = 'NeuralQLearner_simDRLSR_batch'
-	candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
+	#filename = 'NeuralQLearner_simDRLSR_batch'
+	filename = 'MultimodalNeuralQLearner_simDRLSR'		
+	candidates = find_files_candidates(filename,folder_content)
+	if(len(candidates)==0):
+		filename = 'NeuralQLearner_simDRLSR'		
+		candidates = find_files_candidates(filename,folder_content)
+	print(candidates)
+
+	#candidates = [path for path in folder_content if (path.startswith(filename)and path.endswith('.csv'))]
 	score = pd.read_csv(os.path.join(folder,'scores',candidates[-1]), sep=',',nrows=MAX_EPS)
 	print(candidates[-1])
 	#scores.append([calc_average_scores(score['scores'],maxlen=250),label])
@@ -1086,6 +1105,8 @@ def extract_cumulative_rewards_by_emotion(folder,label):
 	labels = ['Neutral Emotion','Positive Emotion','Negative Emotion']
 	for i in range(n_emotions):
 		scores.append([calc_average_scores(dfs[i]['scores'],maxlen=250),labels[i]])
+		print(len(scores[-1][0]))
+
 	return scores	
 
 def cumulative():
@@ -1191,9 +1212,10 @@ def main3(save=True):
 	labels.append("1")
 	#75k rb
 	#folders.append('results/20220108_182042')
-	folders.append('results/20220209_201938')
-	folders.append('results/20220209_201938')
-	folders.append('results/20220209_201938')
+	#folders.append('results/20220209_201938')
+	folders.append('results/20220330_155521')
+	folders.append('results/20220330_155521')
+	folders.append('results/20220330_155521')
 
 	labels.append("2")
 	#75k rb
@@ -1211,7 +1233,7 @@ def main3(save=True):
 	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 if __name__ == "__main__":
-	main(save=True)
-	#main2()
+	#main(save=True)
+	main2()
 	#cumulative()
 
