@@ -5,7 +5,7 @@ PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
         'simulation_speed':     1,
-        'number_of_agents':     6,
+        'number_of_agents':     20,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -13,12 +13,6 @@ PARAMETERS = {
         'frame_height':         264,
         'frame_width':          240,
         'frame_size':           198,
-        #Simulator settings
-        'screen_width':         1080,
-        'screen_height':        768,
-        'quality':              "very low",
-
-
         'port':                 12375,
         'host':                 '127.0.0.1',
         'actions_names':        ['Wait','Look','Wave','Handshake'],
@@ -41,7 +35,7 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  True,
+        'enable_social_signs':  False,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
@@ -53,6 +47,9 @@ PARAMETERS = {
         'emotion_type':         'random',
         'robot_random_position': False,
         'human_appearance':     'default',
+        'screen_width':         320,
+        'screen_height':        240,
+        'quality':              "very low",
 
         'replay_size':          30000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
