@@ -50,6 +50,7 @@ class Environment:
 		self.facial_states = params['facial_states']
 		self.emotion_type= params['emotion_type']
 		self.robot_random_position = params['robot_random_position']
+		self.human_appearance = params['human_appearance']
 		series = pd.Series(self.emotional_states)
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
@@ -113,6 +114,7 @@ class Environment:
 		self.config_simulation("use_depth"+str(self.use_depth_state))
 		self.config_simulation("emotion_type"+str(self.emotion_type))
 		self.config_simulation("robot_random_position"+str(self.robot_random_position))
+		self.config_simulation("human_appearance"+str(self.human_appearance))
 
 	def connect(self):
 		self.socket,self.client = self.__connect()
