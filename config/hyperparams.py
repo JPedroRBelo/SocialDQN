@@ -5,7 +5,7 @@ PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
         'simulation_speed':     1,
-        'number_of_agents':     20,
+        'number_of_agents':     15,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -25,7 +25,7 @@ PARAMETERS = {
         'save_social_states':   True,
         'solved_score':         0.9,
         'stop_when_solved':     False,
-        'save_interval':        15000,
+        'save_interval':        10000,
 
         'socket_time_out':      20.0,
 
@@ -35,7 +35,7 @@ PARAMETERS = {
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
