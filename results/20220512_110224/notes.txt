@@ -1,2 +1,2 @@
 ###Testing SimDRLSR v0.500####
-MDQN with emotions. Without aditional Rewards. HS fail -0.1. Sames as 20220330 
+MDQN with emotions. Without aditional Rewards. HS fail -0.1.

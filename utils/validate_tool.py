@@ -800,15 +800,20 @@ def main(save=False):
 	labels.append('MDQN')
 	'''
 
-	folders.append('results/20220330_155521')
+	#folders.append('results/20220330_155521')
 	labels.append('MDQN')
 	#folders.append('results/20220407_090416')
 	#labels.append('MDQN x0.5')
-	folders.append('results/20220401_200543')
+	#folders.append('results/20220401_200543')
 	#labels.append('MDQN x1.0')
 	labels.append('MDQN with Emotions')
-	folders.append('results/20220403_173206')
+	#folders.append('results/20220403_173206')
 	labels.append('SocialDQN')
+
+
+	folders.append('results/20220509_213720')
+	folders.append('results/20220512_110224')
+	folders.append('results/20220514_030339')
 	
 
 	calc_all_scores(folders,labels)
@@ -916,9 +921,13 @@ def main2(save=True):
 	#folders.append('results/20220214_052339')
 	#folders.append('results/20220330_155521')
 	#folders.append('results/20220330_155521')
-	folders.append('results/20220421_081239')
+	folders.append('results/20220514_030339')
+	folders.append('results/20220514_030339')
+	folders.append('results/20220514_030339')
 
-	#mdqn = 20220330_155521
+	#mdqn = 20220509_213720
+	#mdqn with emotions = 20220512_110224
+	#SocialDQN = 20220514_030339
 
 
 	labels.append("2")
