@@ -801,19 +801,23 @@ def main(save=False):
 	'''
 
 	#folders.append('results/20220330_155521')
-	labels.append('MDQN')
+	
 	#folders.append('results/20220407_090416')
 	#labels.append('MDQN x0.5')
 	#folders.append('results/20220401_200543')
 	#labels.append('MDQN x1.0')
-	labels.append('MDQN with Emotions')
+	
 	#folders.append('results/20220403_173206')
+	
+
+	#labels.append('MDQN')
+	#folders.append('results/20220509_213720')
+	#labels.append('MDQN with Emotions')
+	#folders.append('results/20220512_110224')
 	labels.append('SocialDQN')
-
-
-	folders.append('results/20220509_213720')
-	folders.append('results/20220512_110224')
 	folders.append('results/20220514_030339')
+	labels.append('SocialDQN 128 batch_size')
+	folders.append('results/20220612_072614')
 	
 
 	calc_all_scores(folders,labels)
@@ -921,9 +925,13 @@ def main2(save=True):
 	#folders.append('results/20220214_052339')
 	#folders.append('results/20220330_155521')
 	#folders.append('results/20220330_155521')
-	folders.append('results/20220514_030339')
-	folders.append('results/20220514_030339')
-	folders.append('results/20220514_030339')
+	#folders.append('results/20220514_030339')
+	#folders.append('results/20220514_030339')
+	#folders.append('results/20220514_030339')
+	#20220612_072614
+	folders.append('results/20220612_072614')
+	folders.append('results/20220612_072614')
+	folders.append('results/20220612_072614')
 
 	#mdqn = 20220509_213720
 	#mdqn with emotions = 20220512_110224
@@ -1042,7 +1050,6 @@ def find_files_candidates(filename,folder_content):
 	return candidates
 
 def compare_cumulative_rewards(folders,labels,save=False,save_location=''):
-
 	scores = []
 	for fol,l in zip(folders,labels): 
 		files = os.path.join(fol,'scores')
@@ -1106,7 +1113,6 @@ def extract_cumulative_rewards_by_emotion(folder,label):
 		for step in range(len(emotions[i])):		
 			if(len(emotions[i])>0 ):
 				emotion = emotions[i][step].numpy()
-				print(emotion)
 				n_emotion = convert_one_hot_to_number(emotion[0])
 				if(n_emotion>0):
 					emotion_ep = n_emotion
@@ -1245,7 +1251,7 @@ def main3(save=True):
 	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 if __name__ == "__main__":
-	#main(save=True)
-	main2()
+	main(save=True)
+	#main2()
 	#cumulative()
 

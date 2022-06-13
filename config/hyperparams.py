@@ -30,12 +30,12 @@ PARAMETERS = {
         'socket_time_out':      20.0,
 
         #Multimodal DQN: get detph states
-        'use_depth_state':      True,
+        'use_depth_state':      False,
         'use_only_depth_state': False,
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
@@ -72,7 +72,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           25,                  # minibatch size
+        'batch_size':           128,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
