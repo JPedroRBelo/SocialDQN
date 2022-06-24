@@ -5,7 +5,6 @@ import math
 from agent.SocialNQLearner import Agent
 from agent.ExperienceReplay import ReplayBuffer
 from config.hyperparams import *
-from environment.SimEnvironment import Environment
 
 import matplotlib.pyplot as plt
 import threading
@@ -20,10 +19,13 @@ from utils.print_colors import *
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+SIMULATOR_MODE = 'simulator'
+ROBOT_MODE = 'robot'
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
     parser.add_argument('-s','--sim',default='')
+    parser.add_argument('-e','--environment',default=ROBOT_MODE)
     parser.add_argument('-m','--model',default='',type=dir_path)
     parser.add_argument('-w','--write',default=False,type=bool)
     parser.add_argument('-a','--alg',default='greedy')
@@ -256,6 +258,7 @@ def just_run(steps=30,alg='greedy'):
     model_dir = parsed_args.model
     save_results = parsed_args.write
     alg = parsed_args.alg
+    environment_mode = parsed_args.environment
 
     spec=importlib.util.spec_from_file_location("cfg",os.path.join(model_dir,"hyperparams.py"))
     cfg =  importlib.util.module_from_spec(spec)
@@ -272,12 +275,16 @@ def just_run(steps=30,alg='greedy'):
     solved_score = params['solved_score']
     stop_when_solved = params['stop_when_solved']
 
-    start_simulator = False
-    if(not parsed_args.sim==''):
-        start_simulator = True
-    env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port'])
-    #env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator)
-
+    if(environment_mode=='simulator'): 
+        from environment.SimEnvironment import Environment
+        start_simulator = False
+        if(not parsed_args.sim==''):
+            start_simulator = True
+        env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator,port=params['port'])
+        #env = Environment(params,simulator_path=parsed_args.sim,start_simulator=start_simulator)
+    else:
+        from environment.RobotEnvironment import Environment
+        env = Environment(params)
 
     # Reset the environment
     #env_info = env.reset()
@@ -288,7 +295,7 @@ def just_run(steps=30,alg='greedy'):
     state_size = params['state_size']
     train_after_episodes = params['train_after_episodes']
 
-    print('Number of agents  : ', number_of_agents)
+    if(environment_mode=='simulator'): print('Number of agents  : ', number_of_agents)
     print('Number of actions : ', action_size)
     print('Dimension of state space : ', state_size)
     print('Politc: ',alg    )
@@ -323,7 +330,7 @@ def just_run(steps=30,alg='greedy'):
     ep_social_state = []
 
     done = False
-    env.reset(restart_simulator=True)
+    if(environment_mode=='simulator'): env.reset(restart_simulator=True)
 
     # Capture the current state
     gray_state,_ = env.get_screen()
