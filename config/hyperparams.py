@@ -39,6 +39,10 @@ PARAMETERS = {
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
+        'neutral_emotions':     ['neutral','unknown'],
+        'no_face':              ['no face'],
+        'positive_emotions':    ['happy','surprised'],
+        'negative_emotions':    ['fear','sad','angry','disgust'],
         'emotional_states':     ['no_face','neutral','positive','negative'],
         'facial_states':        ['no_face','face'],
 
@@ -72,7 +76,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           128,                  # minibatch size
+        'batch_size':           25,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
