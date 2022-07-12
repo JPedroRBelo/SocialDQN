@@ -28,6 +28,7 @@ from inspect import currentframe, getframeinfo
 
 debug = False
 ep_debug = 0
+trained = False
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
@@ -250,7 +251,7 @@ def main(cfg):
         envs_fails = [0] * number_of_agents
 
         time_init = time.time()
-        while ep_count<episodes:
+        while ep_count<episodes and (trained==False) :
 
             thread_log = ""
             
@@ -337,7 +338,8 @@ def main(cfg):
             if(ep_count % params['save_interval'] == 0 ) and (ep_count>0):
                 # Export scores to csv file
                 df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
-                df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
+                #df.to_csv('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],ep_count), sep=',',index=False)
+                df.to_csv('scores/%s_%s_batch_%d_lr_%.E.csv'% (agent.name,env_name,params['batch_size'],params['learning_rate'],), sep=',',index=False)
                 save_action_reward_history(actions_rewards,ep_count)
                 save_social_states = params['save_social_states']
                 if(save_social_states):
@@ -481,13 +483,13 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
             #print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
-        '''
-        if (np.mean(scores_window)>=solved_score)and stop_when_solved:
+        
+        if (np.mean(scores_window)>=solved_score)and stop_when_solved:# and (epsilon<=epsilon_floor):
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-            #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
+            agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
             #pass
             trained = True;           
-        '''     
+            
 
         
 
@@ -497,5 +499,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg     
     main(cfg)
-    notes = '###Testing SimDRLSR v0.500####\nMDQN batch size 25. Without aditional Rewards. HS fail -0.1. Batch size = 25 '
+    notes = '###Testing SimDRLSR v0.501####\nSocialDQN batch size 25. HS fail 0. RMSprop. Target update = 4. Default robot position and human appearance. HS sucss = 1'
     save_train_files(cfg,notes)

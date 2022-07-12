@@ -138,6 +138,33 @@ class Environment:
 			return False
 
 
+	def get_images(self,ep,step=None):
+		
+		states_gray = []
+		states_depth = []
+		s = []
+		d = []
+		face_count = []	
+
+		for i in range(self.state_size):
+			size = 0
+			if(step==None):
+				path_image = os.path.join('utils','Image')+"/image_"+str(ep)+"_"+str(i+1)+".png"
+			else:
+				path_image = os.path.join('utils','Image')+"/image_"+str(ep)+"_"+str(step)+".png"
+			image = Image.open(path_image)
+			#image_array = np.array(image)
+			#image = np.moveaxis(image_array, -1, 0)
+			im_l = image.convert('L')
+			#image = self.convert_to_image(image)
+			states_gray.append(im_l)				
+
+
+		s = self.pre_process(states_gray)
+		d = None
+		s = [s,None]
+		return s,d
+
 	def get_screen(self,ep):
 		
 		states_gray = []

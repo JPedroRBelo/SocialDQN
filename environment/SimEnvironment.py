@@ -20,6 +20,7 @@ from utils.SocialSigns import SocialSigns
 import pandas as pd
 import select
 from inspect import currentframe, getframeinfo
+from config.hyperparams import PARAMETERS as aux_parameter
 
 
 
@@ -30,6 +31,8 @@ class Environment:
 		#self.r_len=8
 		self.episode=epi
 		self.verbose = verbose
+		self.params = params
+		self.aux_params = aux_parameter['SimDRLSR']
 		self.raw_frame_height= params['frame_height']
 		self.raw_frame_width= params['frame_width']
 		self.proc_frame_size= params['frame_size']
@@ -48,9 +51,12 @@ class Environment:
 		self.use_only_depth_state = params['use_only_depth_state']
 		self.emotional_states = params['emotional_states']
 		self.facial_states = params['facial_states']
-		self.emotion_type= params['emotion_type']
-		self.robot_random_position = params['robot_random_position']
-		self.human_appearance = params['human_appearance']
+
+
+
+		self.emotion_type = self.check_and_get_parameter('emotion_type')
+		self.robot_random_position = self.check_and_get_parameter('robot_random_position')
+		self.human_appearance = self.check_and_get_parameter('human_appearance')
 		series = pd.Series(self.emotional_states)
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
@@ -82,6 +88,13 @@ class Environment:
 			self.init_simulator(command+par)
 		self.socket,self.client = self.__connect()	
 		self.set_configuration()
+
+	def check_and_get_parameter(self,key):
+		if(key in self.params):
+			return self.params[key]
+		else: 
+			return self.aux_params[key]
+
 
 	def setDebug(self,ep_debug):
 		self.debug = True

@@ -43,8 +43,8 @@ class Agent():
         #self.Q_network_target = QNetwork(state_size, action_size, param['hidden_layers'], seed).to(self.device)
         self.Q_network = DQN(param)
         self.Q_network_target = DQN(param)
-        self.optimizer = optim.Adam(self.Q_network.parameters(), lr=param['learning_rate'])
-        #self.optimizer = optim.RMSprop(self.Q_network.parameters(), lr=param['learning_rate'])
+        #self.optimizer = optim.Adam(self.Q_network.parameters(), lr=param['learning_rate'])
+        self.optimizer = optim.RMSprop(self.Q_network.parameters(), lr=param['learning_rate'])
 
         # Initialize update parameters
         self.t_updates = 0

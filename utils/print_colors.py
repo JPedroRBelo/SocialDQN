@@ -9,6 +9,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+def cyan(text):
+    format(bcolors.OKCYAN,text)
 
 def format(color,text):
     print(color+text + bcolors.ENDC)

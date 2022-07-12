@@ -1,0 +1,2 @@
+###Testing SimDRLSR v0.501####
+SocialDQN batch size 128. HS fail 0. RMSprop. Target update = 1. Random robot position and default human appearance. HS sucss = 2
