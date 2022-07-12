@@ -27,6 +27,7 @@ class FaceDetection:
 		self.NO_FACE = "no face"
 		self.UNKNOWN_EMOTION = "unknown"
 		self.CONF_NO_FACE = 0.5
+		self.emotion_detector = FER(mtcnn=True)
 
 
 	def choose_emotion_by_conf(self,emotions):

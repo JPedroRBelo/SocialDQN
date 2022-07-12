@@ -14,6 +14,7 @@ from PIL import Image
 from torchvision.utils import save_image
 from datetime import datetime
 
+
 import importlib.util
 from utils.print_colors import *
 import warnings
@@ -26,7 +27,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
     parser.add_argument('-s','--sim',default='')
     parser.add_argument('-e','--environment',default=ROBOT_MODE)
-    parser.add_argument('-m','--model',default='',type=dir_path)
+    parser.add_argument('-m','--model',default='')
     parser.add_argument('-w','--write',default=False,type=bool)
     parser.add_argument('-a','--alg',default='greedy')
     return parser.parse_args()
@@ -122,7 +123,7 @@ def validate_eps(eps=1):
     env_name = params['env_name']
 
     params['simulation_speed'] = 5
-
+    actions_names = params['actions_names']
 
 
     save_social_states = params['save_social_states']
@@ -202,7 +203,7 @@ def validate_eps(eps=1):
                 if(next_gray_state!=None):
                     gray_thread = threading.Thread(target=save_image_thread, args=(i_episode,step,'gray',next_gray_state[0]))
                     gray_thread.start()
-
+            action_names = self.para
             ep_actions_rewards.append([action,reward])
             if(save_social_states):
                 ep_social_state.append(gray_state[1])
@@ -268,7 +269,7 @@ def just_run(steps=30,alg='greedy'):
     params = customized_params(cfg.PARAMETERS['SimDRLSR'],save_results)
     #check_consistency_in_configuration_parameters(params)
     env_name = params['env_name']
-
+    actions_names = params['actions_names']
     save_social_states = params['save_social_states']
 
     save_images = params['save_images']
@@ -346,6 +347,7 @@ def just_run(steps=30,alg='greedy'):
 
         # Reset the environment
 
+        header("\nEp: "+str(step))
 
         # Reset score collector
         score = 0
@@ -357,9 +359,13 @@ def just_run(steps=30,alg='greedy'):
         else:
             action = agent.eGreedy(gray_state,0)
         
-        reward, done = env.execute(action)
-        next_gray_state,_ = env.get_screen()
+        print(gray_state[1])
+        blue(f'Action: {action} {actions_names[action]}')
 
+        reward, done = env.execute(action)
+        cyan(f'Reward: {reward}')
+        next_gray_state,_ = env.get_screen()
+        save_images = True
         if(save_images):
             if(gray_state!=None):
                 gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
@@ -369,7 +375,7 @@ def just_run(steps=30,alg='greedy'):
         if(save_social_states):
             ep_social_state.append(gray_state[1])
 
-
+            
         # State transition
         gray_state = next_gray_state
 
@@ -377,7 +383,7 @@ def just_run(steps=30,alg='greedy'):
         if(reward == -1):
             reward = 0
 
-        print(action)
+        
         if(int(action)==3):
             if(reward>=0):
                 handshake_success+=1
@@ -390,6 +396,7 @@ def just_run(steps=30,alg='greedy'):
                 wave_fail+=1
         score += reward
         total_score += score
+        '''
         print("**************************")
         print("Partial Score: \t"+str(total_score))
         print("HS Success: \t"+str(handshake_success))
@@ -399,15 +406,16 @@ def just_run(steps=30,alg='greedy'):
         print("Nº Eps: \t"+str(eps_count))
         print("Nº Steps: \t"+str(step))
         print("**************************")
-        if(done):
+        '''
+        if(done) and (environment_mode=='simulator'): 
             done = False
             env.reset(restart_simulator=True)
             # Capture the current state
             gray_state,_ = env.get_screen()
             eps_count+=1
+    
 
-
-            
+          
     print("**************************")
     print("Partial Score: \t"+str(total_score))
     print("HS Success: \t"+str(handshake_success))

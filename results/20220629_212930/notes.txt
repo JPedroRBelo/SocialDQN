@@ -1,0 +1,2 @@
+###Testing SimDRLSR v0.501####
+SocialDQN batch size 25. Without aditional Rewards. HS fail 0. Batch size = 25 

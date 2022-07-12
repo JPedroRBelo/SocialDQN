@@ -929,9 +929,9 @@ def main2(save=True):
 	#folders.append('results/20220514_030339')
 	#folders.append('results/20220514_030339')
 	#20220612_072614
-	folders.append('results/20220612_072614')
-	folders.append('results/20220612_072614')
-	folders.append('results/20220612_072614')
+	folders.append('results/20220708_124340')
+	folders.append('results/20220708_124340')
+	folders.append('results/20220708_124340')
 
 	#mdqn = 20220509_213720
 	#mdqn with emotions = 20220512_110224
@@ -1251,7 +1251,7 @@ def main3(save=True):
 	plot_culmulative(scores,'result',params,100,save=save,save_location=save_location)
 
 if __name__ == "__main__":
-	main(save=True)
-	#main2()
+	#main(save=True)
+	main2()
 	#cumulative()
 

@@ -13,7 +13,7 @@ from PIL import Image
 import os
 from os.path import abspath, dirname, join
 from inspect import currentframe, getframeinfo
-import pepperparams as cfg  
+import config.pepperparams as cfg  
 from deepface import DeepFace
 import zmq
 import json
@@ -40,6 +40,8 @@ class bcolors:
 def print_blue(text):
 	print(bcolors.OKCYAN + str(text) + bcolors.ENDC)
 
+
+
 def send_py2(self, obj):
     self._check_closed()
     self._check_writable()
@@ -51,7 +53,7 @@ class Environment:
 	def __init__(self,params,verbose=False,epi=0,port=0):
 		# if gpu is to be used
 		self.device = params['device']
-		self.robot_params = cfg.PARAMETERS['SimDRLSR']  
+		self.robot_params = cfg.PARAMETERS['Pepper']  
 		#self.r_len=8
 		self.episode=epi
 		self.verbose = verbose
@@ -72,18 +74,22 @@ class Environment:
 		self.use_only_depth_state = params['use_only_depth_state']
 		self.emotional_states = params['emotional_states']
 		self.facial_states = params['facial_states']
-		self.emotion_type= params['emotion_type']
+		#self.emotion_type= params['emotion_type']
 		series = pd.Series(self.emotional_states)
 		if(self.social_state_size==2):
 			series = pd.Series(self.facial_states)
 		self.one_hot_vectors = pd.get_dummies(series)
 		self.face = FaceDetection()
+		self.neutral_emotions = self.robot_params['neutral_emotions']
+		self.no_face = self.robot_params['no_face']
+		self.positive_emotions = self.robot_params['positive_emotions']
+		self.negative_emotions = self.robot_params['negative_emotions']
 		
 		self.params = params
 		self.step = 0
 		#kQQVGA (160x120), kQVGA (320x240),
 		#kVGA (640x480) or k4VGA (1280x960, only with the HD camera).
-		self.resolution = "kQVGA"
+		self.resolution = "kVGA"
 		#self.resolution = "kQQVGA"
 
 		self.address_name = "pepper.local"
@@ -200,18 +206,29 @@ class Environment:
 		else:
 			message = self.bridge_socket.recv_json()
 		message = json.loads(message)
-		print("Received message")
+		#print("Received message")
 		return message
 
 	def config_robot(self,data,text="Configuring"):
-		if self.verbose: 
-			print('{} Robot: {}'.format(text,data))
+		#if self.verbose: 
+		print('{} Robot: {}'.format(text,data))
 		self.send(data)
 
-		print("Receiving")
+		#print("Receiving")
 		message = self.receive()
-		print("Received: "+str(message))
+		#print("Received: "+str(message))
 		return message
+
+	def emotion_to_group(self,emotion):
+		if emotion in self.neutral_emotions:
+			return 'neutral'
+		elif emotion in self.positive_emotions:
+			return 'positive'
+		elif emotion in self.negative_emotions:
+			return 'negative'
+		else:
+			return 'no_face'
+
 
 
 	def is_final_state(self,action,reward):
@@ -228,7 +245,7 @@ class Environment:
 		self.send(action)
 		terminal = False
 		message = self.receive()
-		print("After action: "+message)
+		#print("After action: "+message)
 
 
 		if("reward" in message):
@@ -237,9 +254,9 @@ class Environment:
 			message = message.replace(" ", "")
 			reward = float(message.replace(',','.'))
 			terminal = self.is_final_state(action,reward)
-			if self.step >= self.params['t_steps']-1:
-				terminal = True
-				reward = self.ep_fail_reward
+			#if self.step >= self.params['t_steps']-1:
+			#	terminal = True
+			#	reward = self.ep_fail_reward
 			#print("Ep: "+str(self.episode)+" step: "+str(self.step))
 			self.step += 1
 			#print("Reward: "+str(original_data)+ "converted "+str(reward))
@@ -284,7 +301,7 @@ class Environment:
 			cv2.destroyAllWindows()
 
 
-	def get_images(self,index):
+	def get_screen(self,index=0):
 		states_emotion = []
 		states_gray = []
 		s = []
@@ -297,7 +314,7 @@ class Environment:
 		#images = json.loads(images)
 		end_time = perf_counter()
 
-		print(f'It took {end_time- start_time: 0.2f} second(s) to complete.')
+		#print(f'It took {end_time- start_time: 0.2f} second(s) to complete.')
 		#print('received ')
 		counter = 0
 		count = 0
@@ -308,15 +325,15 @@ class Environment:
 			
 			#save_path = "Image/image_"+str(index)+"_"+str(count)+".png"
 			save_path = ''
-			if(count%3==0): 
+			if(count%2==0): 
 				#stretching , equalization , adaptative
-				emotion = self.face.recognize_face_emotion_test(image=image,preprocess='adaptative',save_path=save_path)
+				emotion = self.face.recognize_face_emotion(image=image,preprocess='adaptative',save_path=save_path)
 				emotion_count.append(emotion)	
 
 			states_gray.append(image)
 			count += 1
 				
-		print("Step =>"+str(index))
+		#print("Step =>"+str(index))
 		detect_end_time = perf_counter()
 
 		emotion = self.face.choose_emotion_by_conf(emotion_count)
@@ -324,13 +341,12 @@ class Environment:
 		print(f'{emotion} to {group_emotion}')
 		emotion_one_hot = self.get_one_hot_vector(group_emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
-		
-		#group_emotion = emotion
-		print(f'Emotion Detection Time: {detect_end_time- detect_start_time: 0.2f} second(s)')
-		s = self.pre_process(states_gray)
 
+		#group_emotion = emotion
+		#print(f'Emotion Detection Time: {detect_end_time- detect_start_time: 0.2f} second(s)')
+		s = self.pre_process(states_gray)
 		s = [s,face_state]
-		return s
+		return s,None
 
 
 
