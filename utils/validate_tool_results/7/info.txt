@@ -1,2 +1,0 @@
-SocialDQN: Culmulative Rewards
-results/20220209_201938

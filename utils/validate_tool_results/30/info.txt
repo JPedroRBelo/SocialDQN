@@ -1,6 +1,0 @@
-Neutral Emotion
-results/20220612_072614
-Positive Emotion
-results/20220612_072614
-Negative Emotion
-results/20220612_072614

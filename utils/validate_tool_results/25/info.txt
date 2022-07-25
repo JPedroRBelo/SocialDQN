@@ -1,4 +1,0 @@
-SocialMDQN
-results/20220324_172505
-MDQN
-results/20220327_121704

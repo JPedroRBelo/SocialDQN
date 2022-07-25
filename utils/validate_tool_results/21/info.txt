@@ -1,6 +1,0 @@
-MDQN
-results/20220509_213720
-MDQN with Emotions
-results/20220512_110224
-SocialDQN
-results/20220514_030339
