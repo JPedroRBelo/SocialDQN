@@ -1,4 +1,0 @@
-MDQN x0.5
-results/20220407_090416
-MDQN x1.0
-results/20220401_200543

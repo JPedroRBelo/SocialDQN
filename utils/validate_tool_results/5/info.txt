@@ -1,4 +1,0 @@
-Simulator X1: 64 batch size
-results/20220209_201938
-Simulator X2: 128 batch size
-results/20220208_040251
