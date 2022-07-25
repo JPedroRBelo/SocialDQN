@@ -1,3 +1,0 @@
-###Testing SimDRLSR v0.320####
-SocialDQN
-Emotion groups. Second Test. the first one had its parameters set wrong

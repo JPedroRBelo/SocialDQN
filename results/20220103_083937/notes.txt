@@ -1,3 +1,0 @@
-###Testing SimDRLSR v0.320####
-SocialDQN
-Emotion groups. Third Test. RB 75k

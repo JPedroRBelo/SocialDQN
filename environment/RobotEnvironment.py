@@ -40,6 +40,9 @@ class bcolors:
 def print_blue(text):
 	print(bcolors.OKCYAN + str(text) + bcolors.ENDC)
 
+def print_red(text):
+	print(bcolors.FAIL + str(text) + bcolors.ENDC)
+
 
 
 def send_py2(self, obj):
@@ -89,7 +92,7 @@ class Environment:
 		self.step = 0
 		#kQQVGA (160x120), kQVGA (320x240),
 		#kVGA (640x480) or k4VGA (1280x960, only with the HD camera).
-		self.resolution = "kVGA"
+		self.resolution = "kQVGA"
 		#self.resolution = "kQQVGA"
 
 		self.address_name = "pepper.local"
@@ -325,7 +328,7 @@ class Environment:
 			
 			#save_path = "Image/image_"+str(index)+"_"+str(count)+".png"
 			save_path = ''
-			if(count%2==0): 
+			if(count%2==0):
 				#stretching , equalization , adaptative
 				emotion = self.face.recognize_face_emotion(image=image,preprocess='adaptative',save_path=save_path)
 				emotion_count.append(emotion)	
@@ -336,14 +339,15 @@ class Environment:
 		#print("Step =>"+str(index))
 		detect_end_time = perf_counter()
 
+
 		emotion = self.face.choose_emotion_by_conf(emotion_count)
 		group_emotion = self.emotion_to_group(emotion)
-		print(f'{emotion} to {group_emotion}')
+		print_red(f'{emotion} to {group_emotion}')
 		emotion_one_hot = self.get_one_hot_vector(group_emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
 
 		#group_emotion = emotion
-		#print(f'Emotion Detection Time: {detect_end_time- detect_start_time: 0.2f} second(s)')
+		print(f'Emotion Detection Time: {detect_end_time- detect_start_time: 0.2f} second(s)')
 		s = self.pre_process(states_gray)
 		s = [s,face_state]
 		return s,None

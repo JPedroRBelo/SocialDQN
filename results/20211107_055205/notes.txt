@@ -1,4 +1,0 @@
-###TEST####
-SocialDQN
-
-Teste usando somente estado "grayscale", sem informação da face.
