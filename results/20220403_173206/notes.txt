@@ -1,4 +1,0 @@
-###Testing SimDRLSR v0.331####
-SocialDQN
-SocialDQN with emotions. Without aditional Rewards. HS fail -0.1
-MDQN without depth

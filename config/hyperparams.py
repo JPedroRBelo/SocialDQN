@@ -4,8 +4,8 @@
 PARAMETERS = {
     'SimDRLSR': {
         'env_name':             "simDRLSR",
-        'simulation_speed':     2,
-        'number_of_agents':     10,
+        'simulation_speed':     1,
+        'number_of_agents':     15,
         'action_size':          4,
         'state_size':           8,
         't_steps':              25,
@@ -20,11 +20,11 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       10000,
+        'train_episodes':       15000,
         'save_images':          False,
         'save_social_states':   True,
         'solved_score':         0.5,
-        'stop_when_solved':     True,
+        'stop_when_solved':     False,
         'save_interval':        1000,
 
         'socket_time_out':      20.0,
@@ -49,16 +49,16 @@ PARAMETERS = {
         #SimDRLSR config
         #Neutral,Anger,Contempt,Enjoyment,Fear,Sadness,Surprise,random
         'emotion_type':         'random',
-        'robot_random_position': False,
+        'robot_random_position': True,
         'human_appearance':     'default',
         'screen_width':         320,
         'screen_height':        240,
         'quality':              "very low",
 
-        'replay_size':          40000,             # replay buffer size
+        'replay_size':          50000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
-        'replay_initial':       300,              # replay buffer initialize
+        'replay_initial':       500,              # replay buffer initialize
         'update_interval':      1,                  # network updating every update_interval steps
         'fix_target_updates':   4,                # fix the target Q for the fix_target_updates
         'train_after_episodes': True,
@@ -87,7 +87,7 @@ PARAMETERS = {
         'neutral_reward':       0,
         'hs_success_reward':    1,
         'hs_fail_reward':       -0.2,
-        'eg_success_reward':    0,
+        'eg_success_reward':    0.1,
         'eg_fail_reward':       -0.1,
         'ep_fail_reward':       0
     },

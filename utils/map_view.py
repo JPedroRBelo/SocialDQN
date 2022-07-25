@@ -134,12 +134,12 @@ def view(model_dir):
     
     ep_actions_rewards = []
     #for i_episode in range(5, 6):
-    i_episode = 9
+    i_episode = 13
     ep_social_state = []
     # Reset the environment
 
     # Capture the current state
-    gray_state,_ = env.get_images(i_episode,step=1)
+    gray_state,_ = env.get_images(i_episode)#,step=1)
     image = gray_state[0]
     #print(f"Image shape: {image.shape}")
 
@@ -196,6 +196,8 @@ def main():
     model.append('results/20220708_124340')
     model.append('results/20220709_192051')
     model.append('results/20220712_021727')
+    model.append('results/20220712_122421')
+    model.append('results/20220714_085452')
     for model_dir in model:
         view(model_dir)
 

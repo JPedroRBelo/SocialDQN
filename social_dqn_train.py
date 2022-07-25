@@ -29,6 +29,8 @@ from inspect import currentframe, getframeinfo
 debug = False
 ep_debug = 0
 trained = False
+solved_score = 0.5
+stop_when_solved = False
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
@@ -182,7 +184,9 @@ def main(cfg):
         check_consistency_in_configuration_parameters(params)
         env_name = params['env_name']
 
+        global solved_score 
         solved_score = params['solved_score']
+        global stop_when_solved
         stop_when_solved = params['stop_when_solved']
 
         start_simulator = False
@@ -251,8 +255,8 @@ def main(cfg):
         envs_fails = [0] * number_of_agents
 
         time_init = time.time()
+        global trained
         while ep_count<episodes and (trained==False) :
-
             thread_log = ""
             
             for i in range(len(threads_agents)):
@@ -269,7 +273,7 @@ def main(cfg):
                             plot(scores,agent.name,params,ep_count,save=False)
 
 
-                            if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start:
+                            if (train_after_episodes) and (ep_count % update_interval) == 0 and len(memory) > replay_start and (trained==False):
                                 # Recall experiences (miniBatch)
                                 experiences = memory.recall()
                                 # Train agent
@@ -416,7 +420,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
                 action = agent.eGreedy(gray_state,depth_state,epsilon)
             else:
                 error('Unknown Agent Type!')
-
+            #action = int(input("Enter your value: "))
             #action = agent.select_action(gray_state,depth_state)    
             try:         
                 reward, done = env.execute(action)   
@@ -454,8 +458,8 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
                 ep_social_state.append(gray_state[1])
             # Update Q-Learning
             step += 1
-            
-            if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start:
+            global trained
+            if (not train_after_episodes) and (step % update_interval) == 0 and len(memory) > replay_start and (trained==False):
                 # Recall experiences (miniBatch)
                 experiences = memory.recall()
                 # Train agent
@@ -483,8 +487,15 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
             #print('\r#TRAIN Episode:{}, Score:{:.2f}, Average Score:{:.2f}, Exploration:{:1.4f}'.format(i_episode, score, np.mean(scores_window), epsilon))
             #agent.export_network('models/%s_%s_ep%s'% (agent.name,env_name,str(i_episode)))
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
-        
-        if (np.mean(scores_window)>=solved_score)and stop_when_solved:# and (epsilon<=epsilon_floor):
+        solved_score = params['solved_score']
+        stop_when_solved = params['stop_when_solved']
+        env_name = params['env_name']
+        epsilon_floor = params['epsilon_final'] 
+        if (np.mean(scores_window)>=0.45) and (epsilon<=epsilon_floor):
+            print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
+            agent.export_network('models/%s_%s_%s_%s'% (agent.name,env_name,str(i_episode),str(np.mean(scores_window))))
+            #pass
+        if (np.mean(scores_window)>=solved_score) and stop_when_solved and (epsilon<=epsilon_floor):
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
             agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
             #pass
@@ -497,7 +508,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
 if __name__ == "__main__":    
     init_files()
     delete_old_files()
-    import config.hyperparams as cfg     
+    import config.hyperparams as cfg 
     main(cfg)
-    notes = '###Testing SimDRLSR v0.501####\nSocialDQN batch size 25. HS fail 0. RMSprop. Target update = 4. Default robot position and human appearance. HS sucss = 1'
+    notes = '###Testing SimDRLSR v0.510####\nSocialDQN batch size 25. HS fail 0. RMSprop. Target update = 4. Random robot position and  default human appearance. Wv success = 0.1'
     save_train_files(cfg,notes)

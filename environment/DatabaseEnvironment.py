@@ -165,7 +165,7 @@ class Environment:
 		s = [s,None]
 		return s,d
 
-	def get_screen(self,ep):
+	def get_screen(self,ep,aux_emotion=0):
 		
 		states_gray = []
 		states_depth = []
@@ -183,12 +183,15 @@ class Environment:
 			#image = self.convert_to_image(image)
 			states_gray.append(im_l)
 				
-
-		emotion = np.load(os.path.join(self.path,'scores')+'/social_signals_history.npy')[ep]
+		file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
+		if os.path.exists(file_scores):
+			file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
+			emotion = np.load(file_scores)[ep]
+		else: 
+			emotion = aux_emotion
 		emotion = self.emotional_states[emotion]
 		emotion_one_hot = self.get_one_hot_vector(emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
-
 		s = self.pre_process(states_gray)
 		d = None
 		s = [s,face_state]

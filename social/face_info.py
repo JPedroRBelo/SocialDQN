@@ -147,7 +147,10 @@ class FaceDetection:
 		#frame =  np.stack((frame,)*3, axis=-1)
 		
 		blockPrint()
+		print('detecting')
+		start_time = perf_counter()
 		analysis = self.emotion_detector.detect_emotions(frame)
+
 		enablePrint()
 		rects = []
 		if(len(analysis)>0):

@@ -1,4 +1,0 @@
-###Testing SimDRLSR v0.321####
-SocialDQN
-Simulator with emotions. Batch: 64. Emotions. 15000 eps. Fail EP rewards = -1. Simspeed = 1. N agents 10. 
-Only Grayscale imagens, without emotions

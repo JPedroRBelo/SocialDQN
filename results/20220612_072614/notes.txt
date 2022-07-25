@@ -1,2 +1,0 @@
-###Testing SimDRLSR v0.500####
-MDQN batch size 25. Without aditional Rewards. HS fail -0.1. Same as 20220330 

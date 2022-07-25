@@ -1,3 +1,0 @@
-###Testing SimDRLSR v0.321####
-SocialDQN
-Simulator with emotions. Emotions. 100 eps. Fail EP rewards = 0. Simspeed = 1. N agents = 10

@@ -1,3 +1,0 @@
-###Testing SimDRLSR v0.310####
-SocialDQN
-Only Depth sates, without face and gray states

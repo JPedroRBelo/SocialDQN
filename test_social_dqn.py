@@ -13,6 +13,8 @@ import argparse
 from PIL import Image
 from torchvision.utils import save_image
 from datetime import datetime
+from time import perf_counter
+import time
 
 
 import importlib.util
@@ -107,13 +109,14 @@ def plot(scores,name,params,i_episode,save=False):
         fig.savefig('scores/%s_%s_batch_%d_lr_%.E_trained_%d_episodes.png'% (name,params['env_name'],params['batch_size'],params['learning_rate'],i_episode))   # save the figure to file
 
     plt.pause(0.001)  # pause a bit so that plots are updated
-
+'''
 def validate_eps(eps=1):  
 
     # Initialize environment object
     parsed_args = parse_arguments()
     model_dir = parsed_args.model
     save_results = parsed_args.write
+
 
     spec=importlib.util.spec_from_file_location("cfg",os.path.join(model_dir,"hyperparams.py"))
     cfg =  importlib.util.module_from_spec(spec)
@@ -235,9 +238,7 @@ def validate_eps(eps=1):
             #agent.export_network('models/%s_%s_%s'% (agent.name,env_name,str(i_episode)))
             #pass
             break                
-
-
-    '''
+    #''    
     # Export scores to csv file
 
     df = pandas.DataFrame(scores,columns=['scores','average_scores','std'])
@@ -246,11 +247,12 @@ def validate_eps(eps=1):
     if(save_social_states):
         save_social_signals_states(social_signals)
     agent.export_network('models/%s_%s'% (agent.name,env_name))
-    '''
+    #''    
     plot(scores,agent.name,params,episodes+1,save=True)
 
     # Close environment    
     env.close_connection()
+'''
 
 def just_run(steps=30,alg='greedy'):   
 
@@ -260,6 +262,12 @@ def just_run(steps=30,alg='greedy'):
     save_results = parsed_args.write
     alg = parsed_args.alg
     environment_mode = parsed_args.environment
+    if(os.path.isfile(model_dir)):
+        model_file = model_dir
+        model_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(model_dir)), os.pardir))
+    else:
+        model_file = ''
+
 
     spec=importlib.util.spec_from_file_location("cfg",os.path.join(model_dir,"hyperparams.py"))
     cfg =  importlib.util.module_from_spec(spec)
@@ -304,7 +312,12 @@ def just_run(steps=30,alg='greedy'):
     # Initialize agent
     agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
 
-    agent.import_network(os.path.join(model_dir,'models','%s_%s'% (agent.name,env_name)))
+    if(model_file==''):
+        model_file = os.path.join(model_dir,'models','%s_%s'% (agent.name,env_name))
+    else:
+        model_file = model_file.replace('.pth','')
+
+    agent.import_network(model_file)
 
     # Initialize replay buffer
     memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
@@ -343,28 +356,38 @@ def just_run(steps=30,alg='greedy'):
     handshake_fail = 0
     wave_success = 0
     wave_fail = 0
+
     for step in range(1, steps+1):
-
         # Reset the environment
-
+        start_time = perf_counter()
         header("\nEp: "+str(step))
 
         # Reset score collector
         score = 0
         done = False
-
         # Action selection by Epsilon-Greedy policy
+
         if(alg=='random'):
             action = agent.eGreedy(gray_state,1)
         else:
             action = agent.eGreedy(gray_state,0)
-        
+
         print(gray_state[1])
         blue(f'Action: {action} {actions_names[action]}')
-
+        '''
+        if(str(action) == '2' ):
+            if(gray_state!=None):
+                gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
+                gray_thread.start()
+        '''
         reward, done = env.execute(action)
+
         cyan(f'Reward: {reward}')
+
+        time.sleep(1)
         next_gray_state,_ = env.get_screen()
+
+        
         save_images = True
         if(save_images):
             if(gray_state!=None):
@@ -413,7 +436,8 @@ def just_run(steps=30,alg='greedy'):
             # Capture the current state
             gray_state,_ = env.get_screen()
             eps_count+=1
-    
+        end_time = perf_counter()
+        print(f'Ep time: {end_time- start_time: 0.2f} seconds.')
 
           
     print("**************************")

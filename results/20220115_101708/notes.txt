@@ -1,3 +1,0 @@
-###Testing SimDRLSR v0.320####
-SocialDQN
-Simulator with emotions. SocialDQN only with face state, without emotions info.'ep_fail_reward':0. 
