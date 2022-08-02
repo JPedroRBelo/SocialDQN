@@ -9,6 +9,7 @@ environment/simDRLSR/*
 images/*
 convs/*
 aux_scripts/*
+results/*
 
 
 #scores/

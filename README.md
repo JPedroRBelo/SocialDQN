@@ -28,9 +28,13 @@ This project is based on the work of Qureshi *et al* (2016)[1], which involves m
 
 ``git clone git@github.com:JPedroRBelo/SocialDQN.git
 ``
+
+
 Under construction...
 
+# Models
 
+https://drive.google.com/drive/folders/1OqJ09NYZXrRQY2g_Ph-M7mOZtRxYMuA8?usp=sharing
 
 
 

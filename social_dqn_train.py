@@ -510,5 +510,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg 
     main(cfg)
-    notes = '###Testing SimDRLSR v0.510####\nSocialDQN batch size 25. HS fail 0. RMSprop. Target update = 4. Random robot position and  default human appearance. Wv success = 0.1'
+    notes = '###Testing SimDRLSR v0.600####\n Random robot position and  default human appearance. Wv success = 0.1'
     save_train_files(cfg,notes)
