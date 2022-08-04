@@ -304,7 +304,7 @@ class Environment:
 			cv2.destroyAllWindows()
 
 
-	def get_screen(self,index=0):
+	def get_screen(self,index=0,return_aditional_info=False):
 		states_emotion = []
 		states_gray = []
 		s = []
@@ -342,7 +342,7 @@ class Environment:
 
 		emotion = self.face.choose_emotion_by_conf(emotion_count)
 		group_emotion = self.emotion_to_group(emotion)
-		print_red(f'{emotion} to {group_emotion}')
+		#print_red(f'{emotion} to {group_emotion}')
 		emotion_one_hot = self.get_one_hot_vector(group_emotion)
 		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
 
@@ -350,7 +350,11 @@ class Environment:
 		print(f'Emotion Detection Time: {detect_end_time- detect_start_time: 0.2f} second(s)')
 		s = self.pre_process(states_gray)
 		s = [s,face_state]
-		return s,None
+
+		if(return_aditional_info):
+			return s,None,[states_gray,emotion,group_emotion]
+		else:
+			return s,None
 
 
 
