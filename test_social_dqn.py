@@ -32,7 +32,6 @@ def parse_arguments():
     parser.add_argument('-m','--model',default='')
     parser.add_argument('-w','--write',default=False,type=bool)
     parser.add_argument('-a','--alg',default='greedy')
-    parser.add_argument('-n','--savename',default='test')
     return parser.parse_args()
 
 def dir_path(path):
@@ -53,16 +52,6 @@ def save_social_signals_states(social_signals):
     torch.save(social_signals,dirr+file)
 
 
-def save_action_reward_history_robot(dirr,actions_rewards):
-    file = 'action_reward_history.dat'
-    torch.save(actions_rewards,dirr+'/'+file)
-
-def save_social_signals_states_robot(dirr,social_signals):
-
-    file = 'social_signals_history.dat'
-    torch.save(social_signals,dirr+'/'+file)
-
-
 def save_image_thread(ep,step,name,images):
     dirr = 'images/'+str(ep)+"/"
 
@@ -72,17 +61,6 @@ def save_image_thread(ep,step,name,images):
         #img = Image.fromarray(images[i])
         #img.save(dirr+str(name)+"_"+str(i)+".png")
         save_image(images[0][i], dirr+name+str(step)+"_"+str(i)+".png")
-
-
-def save_image_info_thread(ep,step,name,images):
-    dirr = 'images/'+str(ep)+"/"
-
-    os.makedirs(dirr, exist_ok=True)
-    for i in range(len(images)):
-
-        #img = Image.fromarray(images[i])
-        #img.save(dirr+str(name)+"_"+str(i)+".png")
-        images[i].save(dirr+name+str(step)+"_"+str(i)+".png")
 
 
 def plot(scores,name,params,i_episode,save=False):
@@ -283,7 +261,6 @@ def just_run(steps=30,alg='greedy'):
     model_dir = parsed_args.model
     save_results = parsed_args.write
     alg = parsed_args.alg
-    savename = parsed_args.savename
     environment_mode = parsed_args.environment
     if(os.path.isfile(model_dir)):
         model_file = model_dir
@@ -304,7 +281,6 @@ def just_run(steps=30,alg='greedy'):
     save_social_states = params['save_social_states']
 
     save_images = params['save_images']
-
     solved_score = params['solved_score']
     stop_when_solved = params['stop_when_solved']
 
@@ -370,13 +346,8 @@ def just_run(steps=30,alg='greedy'):
     done = False
     if(environment_mode=='simulator'): env.reset(restart_simulator=True)
 
-    info = None
     # Capture the current state
-    if(save_images) and (environment_mode=='robot'):
-        gray_state,n_depth,info = env.get_screen(return_aditional_info=True)
-
-    else:
-        gray_state,_ = env.get_screen()
+    gray_state,_ = env.get_screen()
 
     total_score = 0
     eps_count = 1
@@ -386,111 +357,89 @@ def just_run(steps=30,alg='greedy'):
     wave_success = 0
     wave_fail = 0
 
-    try:
-        for step in range(1, steps+1):
-            # Reset the environment
-            start_time = perf_counter()
-            header("\nEp: "+str(step))
+    for step in range(1, steps+1):
+        # Reset the environment
+        start_time = perf_counter()
+        header("\nEp: "+str(step))
 
-            # Reset score collector
-            score = 0
+        # Reset score collector
+        score = 0
+        done = False
+        # Action selection by Epsilon-Greedy policy
+
+        if(alg=='random'):
+            action = agent.eGreedy(gray_state,1)
+        else:
+            action = agent.eGreedy(gray_state,0)
+
+        print(gray_state[1])
+        blue(f'Action: {action} {actions_names[action]}')
+        '''
+        if(str(action) == '2' ):
+            if(gray_state!=None):
+                gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
+                gray_thread.start()
+        '''
+        reward, done = env.execute(action)
+
+        cyan(f'Reward: {reward}')
+
+        time.sleep(1)
+        next_gray_state,_ = env.get_screen()
+
+        
+        save_images = True
+        if(save_images):
+            if(gray_state!=None):
+                gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
+                gray_thread.start()
+
+        ep_actions_rewards.append([action,reward])
+        if(save_social_states):
+            ep_social_state.append(gray_state[1])
+
+            
+        # State transition
+        gray_state = next_gray_state
+
+        # Update total score
+        if(reward == -1):
+            reward = 0
+
+        
+        if(int(action)==3):
+            if(reward>=0):
+                handshake_success+=1
+            else:
+                handshake_fail+=1
+        if(int(action)==2):
+            if(reward>=0):
+                wave_success+=1
+            else:
+                wave_fail+=1
+        score += reward
+        total_score += score
+        '''
+        print("**************************")
+        print("Partial Score: \t"+str(total_score))
+        print("HS Success: \t"+str(handshake_success))
+        print("HS Fail: \t"+str(handshake_fail))
+        print("Wv Success: \t"+str(wave_success))
+        print("Wv Fail: \t"+str(wave_fail))
+        print("Nº Eps: \t"+str(eps_count))
+        print("Nº Steps: \t"+str(step))
+        print("**************************")
+        '''
+        if(done) and (environment_mode=='simulator'): 
             done = False
-            # Action selection by Epsilon-Greedy policy
-
-            if(alg=='random'):
-                action = agent.eGreedy(gray_state,1)
-            else:
-                action = agent.eGreedy(gray_state,0)
-            if(info==None):
-                print(gray_state[1])
-            else:
-                emotion = info[1]
-                group_emotion = info[2]
-                red(f'{emotion} to {group_emotion}')   
-            blue(f'Action: {action} {actions_names[action]}')
-            '''
-            if(str(action) == '2' ):
-                if(gray_state!=None):
-                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
-                    gray_thread.start()
-            '''
-            reward, done = env.execute(action)
-
-            cyan(f'Reward: {reward}')
-
-            time.sleep(1)
-            info = None
+            env.reset(restart_simulator=True)
             # Capture the current state
-            if(save_images) and (environment_mode=='robot'):
-                next_gray_state,n_depth,info = env.get_screen(return_aditional_info=True)
+            gray_state,_ = env.get_screen()
+            eps_count+=1
+        end_time = perf_counter()
+        print(f'Ep time: {end_time- start_time: 0.2f} seconds.')
 
-            else:
-                next_gray_state,_ = env.get_screen()
-
-
-            
-            if(save_images) and (environment_mode=='simulator'): 
-                if(gray_state!=None):
-                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
-                    gray_thread.start()
-            elif(save_images) and (environment_mode=='robot'): 
-                if(info != None) and (info[0] != None):
-                    image_thread = threading.Thread(target=save_image_info_thread, args=(savename,step,'gray',info[0]))
-                    image_thread.start()
-
-
-
-            ep_actions_rewards.append([action,reward])
-            if(save_social_states):
-                ep_social_state.append(gray_state[1])
-
-                
-            # State transition
-            gray_state = next_gray_state
-
-            # Update total score
-            if(reward == -1):
-                reward = 0
-
-            
-            if(int(action)==3):
-                if(reward>=0):
-                    handshake_success+=1
-                else:
-                    handshake_fail+=1
-            if(int(action)==2):
-                if(reward>=0):
-                    wave_success+=1
-                else:
-                    wave_fail+=1
-            score += reward
-            total_score += score
-            '''
-            print("**************************")
-            print("Partial Score: \t"+str(total_score))
-            print("HS Success: \t"+str(handshake_success))
-            print("HS Fail: \t"+str(handshake_fail))
-            print("Wv Success: \t"+str(wave_success))
-            print("Wv Fail: \t"+str(wave_fail))
-            print("Nº Eps: \t"+str(eps_count))
-            print("Nº Steps: \t"+str(step))
-            print("**************************")
-            '''
-            if(done) and (environment_mode=='simulator'): 
-                done = False
-                env.reset(restart_simulator=True)
-                # Capture the current state
-                gray_state,_ = env.get_screen()
-                eps_count+=1
-            end_time = perf_counter()
-            print(f'Ep time: {end_time- start_time: 0.2f} seconds.')
-    except KeyboardInterrupt:       
-
-        # Close environment    
-        #save_files(actions_rewards,ep_actions_rewards,ep_social_state,social_signals,save_social_states,savename)
-        #env.close_connection()
-        red("Exiting...")
-
+          
     print("**************************")
     print("Partial Score: \t"+str(total_score))
     print("HS Success: \t"+str(handshake_success))
@@ -500,19 +449,16 @@ def just_run(steps=30,alg='greedy'):
     print("Nº Eps: \t"+str(eps_count))
     print("Nº Steps: \t"+str(step))
     print("**************************")
-    env.close_connection()
+    # Push to score list
     actions_rewards.append( ep_actions_rewards)
     if(save_social_states):
         social_signals.append(ep_social_state)
 
     if(save_social_states):
-        #if(environment_mode=='')
-        dirr = 'images/'+savename+'/'
-        save_action_reward_history_robot(dirr,actions_rewards)
-        save_social_signals_states_robot(dirr,social_signals)
-
-
-#def save_files(actions_rewards,ep_actions_rewards,ep_social_state,social_signals,save_social_states,savename):
+        save_action_reward_history(actions_rewards)
+        save_social_signals_states(social_signals)
+    # Close environment    
+    env.close_connection()
 
 
 
