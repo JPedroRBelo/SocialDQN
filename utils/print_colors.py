@@ -32,3 +32,6 @@ def blue(text):
 
 def bold(text):
     format(bcolors.BOLD,text)
+
+def red(text):
+    print(bcolors.FAIL + str(text) + bcolors.ENDC)
