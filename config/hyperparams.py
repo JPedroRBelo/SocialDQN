@@ -20,10 +20,10 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       15000,
+        'train_episodes':       10000,
         'save_images':          False,
         'save_social_states':   True,
-        'solved_score':         0.5,
+        'solved_score':         0.4,
         'stop_when_solved':     False,
         'save_interval':        1000,
 
@@ -49,7 +49,7 @@ PARAMETERS = {
         #SimDRLSR config
         #Neutral,Anger,Contempt,Enjoyment,Fear,Sadness,Surprise,random
         'emotion_type':         'random',
-        'robot_random_position': True,
+        'robot_random_position': False,
         'human_appearance':     'default',
         'screen_width':         320,
         'screen_height':        240,
@@ -87,7 +87,7 @@ PARAMETERS = {
         'neutral_reward':       0,
         'hs_success_reward':    1,
         'hs_fail_reward':       -0.2,
-        'eg_success_reward':    0.1,
+        'eg_success_reward':    0,
         'eg_fail_reward':       -0.1,
         'ep_fail_reward':       0
     },
