@@ -8,6 +8,7 @@ simDRLSR/*
 environment/simDRLSR/*
 images/*
 convs/*
+Robot*
 aux_scripts/*
 results/*
 
