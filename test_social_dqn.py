@@ -284,6 +284,17 @@ def just_run(steps=30,alg='greedy'):
     save_results = parsed_args.write
     alg = parsed_args.alg
     savename = parsed_args.savename
+    if(savename=='test'):
+        count = 0
+        while True:
+
+            dirr = 'images/'+str(count)+"/"
+            if(not os.path.isdir(dirr)):
+                savename = count
+                break
+            else:
+                count += 1
+
     environment_mode = parsed_args.environment
     if(os.path.isfile(model_dir)):
         model_file = model_dir
