@@ -93,7 +93,7 @@ class Environment:
 		#kQQVGA (160x120), kQVGA (320x240),
 		#kVGA (640x480) or k4VGA (1280x960, only with the HD camera).
 		self.resolution = "kQVGA"
-		#self.resolution = "kQQVGA"
+		self.resolution = "kQVGA"
 
 		self.address_name = "pepper.local"
 		#self.address_name = "localhost"
