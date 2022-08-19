@@ -429,7 +429,7 @@ def just_run(steps=30,alg='greedy'):
 
             cyan(f'Reward: {reward}')
 
-            time.sleep(1)
+            #time.sleep(2)
             info = None
             # Capture the current state
             if(save_images) and (environment_mode=='robot'):
@@ -518,7 +518,7 @@ def just_run(steps=30,alg='greedy'):
 
     if(save_social_states):
         #if(environment_mode=='')
-        dirr = 'images/'+savename+'/'
+        dirr = 'images/'+str(savename)+'/'
         save_action_reward_history_robot(dirr,actions_rewards)
         save_social_signals_states_robot(dirr,social_signals)
 
