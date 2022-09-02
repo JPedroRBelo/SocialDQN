@@ -20,22 +20,22 @@ PARAMETERS = {
         'device':               "cpu",
         'stop_scores':          1.0,
         'scores_window_size':   100,
-        'train_episodes':       10000,
+        'train_episodes':       15000,
         'save_images':          False,
         'save_social_states':   True,
-        'solved_score':         0.4,
+        'solved_score':         0.55,
         'stop_when_solved':     False,
         'save_interval':        1000,
 
         'socket_time_out':      20.0,
 
         #Multimodal DQN: get detph states
-        'use_depth_state':      False,
+        'use_depth_state':      True,
         'use_only_depth_state': False,
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  True,
+        'enable_social_signs':  False,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
@@ -86,9 +86,11 @@ PARAMETERS = {
 
         'neutral_reward':       0,
         'hs_success_reward':    1,
-        'hs_fail_reward':       -0.2,
+        'hs_fail_reward':       -0.1,
+        #'hs_fail_reward':       -0.2,
         'eg_success_reward':    0,
-        'eg_fail_reward':       -0.1,
+        'eg_success_reward':    0,
+        #'eg_fail_reward':       -0.1,
         'ep_fail_reward':       0
     },
 }

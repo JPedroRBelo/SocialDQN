@@ -24,6 +24,8 @@ from inspect import currentframe, getframeinfo
 import torchvision.transforms.functional as TF
 import cv2 
 import cv2 as cv
+from social.face_info import FaceDetection
+import config.pepperparams as cfg_robot  
 
 
 
@@ -32,6 +34,7 @@ class Environment:
 		# if gpu is to be used
 		self.device = params['device']
 		#self.r_len=8
+		self.robot_params = cfg_robot.PARAMETERS['Pepper']  
 		self.raw_frame_height= params['frame_height']
 		self.raw_frame_width= params['frame_width']
 		self.proc_frame_size= params['frame_size']
@@ -56,6 +59,12 @@ class Environment:
 		self.path = path
 		self.params = params
 		self.step = 0
+		self.face = FaceDetection()
+		self.neutral_emotions = self.robot_params['neutral_emotions']
+		self.no_face = self.robot_params['no_face']
+		self.positive_emotions = self.robot_params['positive_emotions']
+		self.negative_emotions = self.robot_params['negative_emotions']
+		
 
 		self.SocialSigns = SocialSigns()
 
@@ -165,33 +174,63 @@ class Environment:
 		s = [s,None]
 		return s,d
 
-	def get_screen(self,ep,aux_emotion=0):
+	def emotion_to_group(self,emotion):
+		if emotion in self.neutral_emotions:
+			return 'neutral'
+		elif emotion in self.positive_emotions:
+			return 'positive'
+		elif emotion in self.negative_emotions:
+			return 'negative'
+		else:
+			return 'no_face'
+
+	def get_screen(self,ep,get_emotion=False,database=''):
 		
 		states_gray = []
 		states_depth = []
 		s = []
 		d = []
+		emotion_count = []
 		face_count = []	
 
 		for i in range(self.state_size):
 			size = 0
-			path_image = os.path.join(self.path,'images','2')+"/gray"+str(ep)+"_"+str(i)+".png"
+			if(database==''):
+				database = os.path.join(self.path,'images','2')
+
+			path_image = os.path.join(database,"gray"+str(ep)+"_"+str(i)+".png")
+
+
 			image = Image.open(path_image)
 			#image_array = np.array(image)
 			#image = np.moveaxis(image_array, -1, 0)
 			im_l = image.convert('L')
 			#image = self.convert_to_image(image)
 			states_gray.append(im_l)
-				
-		file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
-		if os.path.exists(file_scores):
-			file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
-			emotion = np.load(file_scores)[ep]
+			save_path = ''
+			if(get_emotion):
+					emotion = self.face.recognize_face_emotion(image=im_l,preprocess='adaptative',save_path=save_path)
+					emotion_count.append(emotion)	
+
+
+		if(get_emotion):
+			emotion = self.face.choose_emotion_by_conf(emotion_count)
+			group_emotion = self.emotion_to_group(emotion)
+			#print_red(f'{emotion} to {group_emotion}')
+			emotion_one_hot = self.get_one_hot_vector(group_emotion)
+			face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
+
 		else: 
-			emotion = aux_emotion
-		emotion = self.emotional_states[emotion]
-		emotion_one_hot = self.get_one_hot_vector(emotion)
-		face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
+			file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
+			if os.path.exists(file_scores):
+				file_scores = os.path.join(self.path,'scores','social_signals_history.npy')
+				emotion = np.load(file_scores)[ep]
+			else: 
+				emotion = aux_emotion
+			emotion = self.emotional_states[emotion]
+			emotion_one_hot = self.get_one_hot_vector(emotion)
+			face_state = torch.FloatTensor(emotion_one_hot).unsqueeze(0)
+
 		s = self.pre_process(states_gray)
 		d = None
 		s = [s,face_state]

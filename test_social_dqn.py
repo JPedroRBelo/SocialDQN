@@ -429,6 +429,15 @@ def just_run(steps=30,alg='greedy'):
 
             cyan(f'Reward: {reward}')
 
+            if(save_images) and (environment_mode=='simulator'): 
+                if(gray_state!=None):
+                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0].copy()))
+                    gray_thread.start()
+            elif(save_images) and (environment_mode=='robot'): 
+                if(info != None) and (info[0] != None):
+                    image_thread = threading.Thread(target=save_image_info_thread, args=(savename,step,'gray',info[0].copy()))
+                    image_thread.start()
+
             #time.sleep(2)
             info = None
             # Capture the current state
@@ -440,14 +449,7 @@ def just_run(steps=30,alg='greedy'):
 
 
             
-            if(save_images) and (environment_mode=='simulator'): 
-                if(gray_state!=None):
-                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
-                    gray_thread.start()
-            elif(save_images) and (environment_mode=='robot'): 
-                if(info != None) and (info[0] != None):
-                    image_thread = threading.Thread(target=save_image_info_thread, args=(savename,step,'gray',info[0]))
-                    image_thread.start()
+            
 
 
 
@@ -457,7 +459,7 @@ def just_run(steps=30,alg='greedy'):
 
                 
             # State transition
-            gray_state = next_gray_state
+            gray_state = next_gray_state.copy()
 
             # Update total score
             if(reward == -1):

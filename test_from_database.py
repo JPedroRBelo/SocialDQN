@@ -106,7 +106,7 @@ def validate_eps(eps=1):
     #save_action_reward_history(os.path.join(path,'scores'),ep_actions_rewards)
 
 
-def from_images_without_emotions(eps=1):  
+def from_images(eps=1,get_emotion=False,save_files=False):  
 
     # Initialize environment object
     parsed_args = parse_arguments()
@@ -149,38 +149,61 @@ def from_images_without_emotions(eps=1):
 
     """ Training loop  """
     scores = []                                 # list containing scores from each episode
-    actions_rewards = []
-    social_signals = []
+
 
     episodes = eps
     path = ''
     env = Environment(params,'')
-    ep_actions_rewards = []
-    for i_episode in range(1, episodes+1):
 
-        print(f'Ep: \t{i_episode}')
-        for emotion in range(4):
-        
-            ep_social_state = []
-            # Reset the environment
+    database = ''
+    dirs = ['merged0830']
+    #dirs = range(38)
+    for j in dirs:
+        social_signals = []
+        actions_rewards = []
+        print("=====Ep: "+str(j))
+        ep_actions_rewards = []
+        ep_social_state = []
+        database = os.path.join('/','home','josepedro','Experimento','drive',str(j))
+        for step in range(1, episodes+1):
+            
+            image_test = os.path.join(database,"gray"+str(step)+"_0.png")
+            if(not os.path.exists(image_test)):
+                break
+            print(f'Step: \t{step}')
 
             # Capture the current state
-            gray_state,_ = env.get_screen(i_episode,emotion)
+            gray_state,_ = env.get_screen(step,get_emotion=True,database=database)
+            print(gray_state[1])
 
 
             # Action selection by Epsilon-Greedy policy
             action = agent.greedy(gray_state)
             
-            print(f'Emotion:{emotion}. Action: {action}')
+            #print(f'Emotion:{gray_state[1]}. Action: {action}')
             reward = 0
-            ep_actions_rewards.append([action,reward])
-        print('\n')
-        
-    #save_action_reward_history(os.path.join(path,'scores'),ep_actions_rewards)
+            #print('\n')
+            if(save_files):
+                ep_actions_rewards.append([action,reward])
+                ep_social_state.append(gray_state[1])
+            
+        social_signals.append(ep_social_state)
+        actions_rewards.append(ep_actions_rewards)
+        #save_action_reward_history(os.path.join(path,'scores'),ep_actions_rewards)
+        if(save_files):
 
+            save_action_reward_history(database,actions_rewards)
+            save_social_signals_states(database,social_signals)
 
     
+def save_action_reward_history(dirr,actions_rewards):
+    file = 'action_reward_history.dat'
+    torch.save(actions_rewards,dirr+'/'+file)
 
+def save_social_signals_states(dirr,social_signals):
+
+    file = 'social_signals_history.dat'
+    torch.save(social_signals,dirr+'/'+file)
 
 
 
@@ -199,7 +222,8 @@ def customized_params(params,save_results):
 
 def main():
     #validate_eps(1)
-    from_images_without_emotions(100)
+
+    from_images(5000,get_emotion=True,save_files=True)
 
 if __name__ == "__main__":      
     main()
