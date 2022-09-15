@@ -510,5 +510,5 @@ if __name__ == "__main__":
     delete_old_files()
     import config.hyperparams as cfg 
     main(cfg)
-    notes = '###MDQN with SimDRLSR v0.611####\n Pepper robot in front of elevator  default human appearance.'
+    notes = '###SocialDQN with SimDRLSR v0.611####\n Pepper robot in front of elevator  default human appearance.'
     save_train_files(cfg,notes)
