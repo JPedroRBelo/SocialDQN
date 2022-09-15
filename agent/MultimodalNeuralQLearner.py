@@ -181,6 +181,8 @@ class MultimodalAgent():
         self.gray_Q_network.load_state_dict(torch.load('%sgray.pth'% (filename)))
         self.depth_Q_network.load_state_dict(torch.load('%sdepth.pth'% (filename)))
 
+    
+
 # -------------------------------------------------------------------- #
 # EOF
 # -------------------------------------------------------------------- #

@@ -2,7 +2,8 @@ from utils.misc import *
 import math
 # Config
 #from agent.DoubleQLearner import Agent
-from agent.SocialNQLearner import Agent
+#from agent.SocialNQLearner import Agent
+from agent.MultimodalNeuralQLearner import MultimodalAgent as Agent
 from agent.ExperienceReplay import ReplayBuffer
 from config.hyperparams import *
 
@@ -284,6 +285,7 @@ def just_run(steps=30,alg='greedy'):
     save_results = parsed_args.write
     alg = parsed_args.alg
     savename = parsed_args.savename
+
     if(savename=='test'):
         count = 0
         while True:
@@ -318,6 +320,9 @@ def just_run(steps=30,alg='greedy'):
 
     solved_score = params['solved_score']
     stop_when_solved = params['stop_when_solved']
+    mdqn = params['use_depth_state']
+
+        
 
     if(environment_mode=='simulator'): 
         from environment.SimEnvironment import Environment
@@ -345,17 +350,24 @@ def just_run(steps=30,alg='greedy'):
     print('Politc: ',alg    )
 
     # Initialize agent
-    agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
+    if(mdqn):
+        from agent.MultimodalNeuralQLearner import MultimodalAgent
+        agent = MultimodalAgent(state_size=state_size, action_size=action_size, param=params, seed=0,)
+    else:
+        agent = Agent(state_size=state_size, action_size=action_size, param=params, seed=0,)
 
     if(model_file==''):
         model_file = os.path.join(model_dir,'models','%s_%s'% (agent.name,env_name))
     else:
         model_file = model_file.replace('.pth','')
 
+    if(mdqn):
+        model_file = model_file.replace('gray','').replace('depth','')
     agent.import_network(model_file)
 
     # Initialize replay buffer
-    memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
+    #memory = ReplayBuffer(action_size, params['replay_size'], params['batch_size'], seed=0,device=params['device'])
+    
     update_interval = params['update_interval']
     replay_start = params['replay_initial']
 
@@ -384,10 +396,10 @@ def just_run(steps=30,alg='greedy'):
     info = None
     # Capture the current state
     if(save_images) and (environment_mode=='robot'):
-        gray_state,n_depth,info = env.get_screen(return_aditional_info=True)
+        gray_state,depth_state,info = env.get_screen(return_aditional_info=True)
 
     else:
-        gray_state,_ = env.get_screen()
+        gray_state,depth_state = env.get_screen()
 
     total_score = 0
     eps_count = 1
@@ -407,11 +419,18 @@ def just_run(steps=30,alg='greedy'):
             score = 0
             done = False
             # Action selection by Epsilon-Greedy policy
-
+            prob = 0
             if(alg=='random'):
+                prob = 1
                 action = agent.eGreedy(gray_state,1)
+
+            if(mdqn):
+                action = agent.eGreedy(gray_state,depth_state,prob)
             else:
-                action = agent.eGreedy(gray_state,0)
+                action = agent.eGreedy(gray_state,prob)
+
+
+
             if(info==None):
                 print(gray_state[1])
             else:
@@ -431,8 +450,13 @@ def just_run(steps=30,alg='greedy'):
 
             if(save_images) and (environment_mode=='simulator'): 
                 if(gray_state!=None):
-                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0].copy()))
+                    gray_thread = threading.Thread(target=save_image_thread, args=(1,step,'gray',gray_state[0]))
                     gray_thread.start()
+                if(mdqn):
+                    if(depth_state!=None):
+                        depth_thread = threading.Thread(target=save_image_thread, args=('1depth',step,'depth',depth_state[0]))                    
+                        depth_thread.start()
+
             elif(save_images) and (environment_mode=='robot'): 
                 if(info != None) and (info[0] != None):
                     image_thread = threading.Thread(target=save_image_info_thread, args=(savename,step,'gray',info[0].copy()))
@@ -445,7 +469,7 @@ def just_run(steps=30,alg='greedy'):
                 next_gray_state,n_depth,info = env.get_screen(return_aditional_info=True)
 
             else:
-                next_gray_state,_ = env.get_screen()
+                next_gray_state,next_depth_state = env.get_screen()
 
 
             
@@ -460,6 +484,7 @@ def just_run(steps=30,alg='greedy'):
                 
             # State transition
             gray_state = next_gray_state.copy()
+            depth_state = next_depth_state.copy()
 
             # Update total score
             if(reward == -1):

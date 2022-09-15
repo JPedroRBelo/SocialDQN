@@ -23,19 +23,19 @@ PARAMETERS = {
         'train_episodes':       15000,
         'save_images':          False,
         'save_social_states':   True,
-        'solved_score':         0.55,
+        'solved_score':         0.75,
         'stop_when_solved':     False,
         'save_interval':        1000,
 
         'socket_time_out':      20.0,
 
         #Multimodal DQN: get detph states
-        'use_depth_state':      True,
+        'use_depth_state':      False,
         'use_only_depth_state': False,
         #WARNING: this mode turns all images to full black, in order to test the input of social signals
         'blind_mode':           False,
         #Social DQN params
-        'enable_social_signs':  False,
+        'enable_social_signs':  True,
         #Social State Sizes: 4 = emotional states; 2 = facial_states
         'social_state_size':    4,
         'nstates_social':       [256],
@@ -55,7 +55,7 @@ PARAMETERS = {
         'screen_height':        240,
         'quality':              "very low",
 
-        'replay_size':          50000,             # replay buffer size
+        'replay_size':          60000,             # replay buffer size
         #'replay_initial':       10000,              # replay buffer initialize
         #'replay_size':          50000,             # replay buffer size
         'replay_initial':       500,              # replay buffer initialize
@@ -76,7 +76,7 @@ PARAMETERS = {
         'gamma':                0.99,               # discount factor
         'thau':                 1e-3,               # for soft update of target parameters
         #'batch_size':           25,                  # minibatch size
-        'batch_size':           25,                  # minibatch size
+        'batch_size':           64,                  # minibatch size
 
         'nstates':              [16,32,64,256],
         #'kernels':              [4,2],
@@ -86,11 +86,11 @@ PARAMETERS = {
 
         'neutral_reward':       0,
         'hs_success_reward':    1,
-        'hs_fail_reward':       -0.1,
-        #'hs_fail_reward':       -0.2,
+        #'hs_fail_reward':       -0.1,
+        'hs_fail_reward':       -0.2,
         'eg_success_reward':    0,
-        'eg_success_reward':    0,
-        #'eg_fail_reward':       -0.1,
+        #'eg_fail_reward':    0,
+        'eg_fail_reward':       -0.1,
         'ep_fail_reward':       0
     },
 }

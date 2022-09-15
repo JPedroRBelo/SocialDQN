@@ -491,7 +491,7 @@ def execute_ep(env,agent,i_episode,memory,params,epsilon,scores,scores_window,ac
         stop_when_solved = params['stop_when_solved']
         env_name = params['env_name']
         epsilon_floor = params['epsilon_final'] 
-        if (np.mean(scores_window)>=0.45) and (epsilon<=epsilon_floor):
+        if (np.mean(scores_window)>=solved_score) and (epsilon<=epsilon_floor):
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
             agent.export_network('models/%s_%s_%s_%s'% (agent.name,env_name,str(i_episode),str(np.mean(scores_window))))
             #pass
